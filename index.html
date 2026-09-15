@@ -484,24 +484,33 @@ async function initApp() {
     
     if (sb && STATE.user) {
       try {
-        const { data: contents } = await sb.from('content_library').select('*').eq('owner_id', STATE.user.id);
+        // Ambil data dari Supabase
+        const { data: contents, error: err1 } = await sb.from('content_library').select('*').eq('owner_id', STATE.user.id);
+        if (err1) throw err1;
         STATE.contentLibrary = contents || [];
         
-        const { data: calItems } = await sb.from('calendar').select('*').eq('owner_id', STATE.user.id);
+        const { data: calItems, error: err2 } = await sb.from('calendar').select('*').eq('owner_id', STATE.user.id);
+        if (err2) throw err2;
         STATE.calendarItems = calItems || [];
       } catch (dbErr) {
-        console.error("Error mengambil data dari Supabase:", dbErr.message);
-        toast("Gagal memuat data, periksa tabel database.", "warning");
+        console.error("Database Error:", dbErr.message);
+        toast("Data gagal dimuat dari Supabase, periksa RLS Policy.", "warning");
+        // Tetap gunakan data kosong agar tidak blank
+        STATE.contentLibrary = [];
+        STATE.calendarItems = [];
       }
     } else {
       STATE.contentLibrary = LocalDB.get('content_library_' + STATE.user.id, []);
       STATE.calendarItems = LocalDB.get('calendar_' + STATE.user.id, []);
-      STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
-      if (STATE.usage.date !== new Date().toDateString()) { STATE.usage = { today: 0, date: new Date().toDateString() }; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
     }
     
+    STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
+    if (STATE.usage.date !== new Date().toDateString()) { STATE.usage = { today: 0, date: new Date().toDateString() }; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
+    
     STATE.subscriptions = { plan: STATE.user.plan || 'FREE' };
-    renderSidebar(); updateTopbar(); navigateTo('dashboard');
+    renderSidebar(); 
+    updateTopbar(); 
+    navigateTo('dashboard');
   } catch (err) {
     console.error("Init App Error:", err);
     toast("Terjadi error saat memuat aplikasi: " + err.message, "error");
