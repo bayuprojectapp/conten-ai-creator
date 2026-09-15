@@ -504,8 +504,12 @@ async function initApp() {
       STATE.calendarItems = LocalDB.get('calendar_' + STATE.user.id, []);
     }
     
+    // INI BAGIAN YANG DIPERBAIKI:
     STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
-    if (STATE.usage.date !== new Date().toDateString()) { STATE.usage = { today: 0, date: new Date().toDateString() }; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
+    if (STATE.usage.date !== new Date().toDateString()) { 
+      STATE.usage = { today: 0, date: new Date().toDateString() }; 
+      LocalDB.set('usage_' + STATE.user.id, STATE.usage); 
+    }
     
     STATE.subscriptions = { plan: STATE.user.plan || 'FREE' };
     renderSidebar(); 
