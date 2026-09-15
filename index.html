@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<!-- Supabase JS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #f8fafc; --bg-2: #f1f5f9; --surface: #ffffff; --border: #e2e8f0;
@@ -199,7 +201,7 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
     </div>
     <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
       <div class="card p-6"><div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">Free</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp0</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Cocok untuk pemula</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 5 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Basic Content Generator</li></ul><button onclick="showAuth('register')" class="btn btn-secondary w-full">Mulai Gratis</button></div>
-      <div class="card p-6 border-2 border-[var(--primary)] relative"><span class="badge badge-primary absolute -top-2.5 left-1/2 -translate-x-1/2">Populer</span><div class="text-xs font-semibold text-[var(--primary)] uppercase mb-1">Pro</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp99K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk content creator aktif</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 100 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua AI Tools</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Content Calendar & Analytics</li></ul><button onclick="showAuth('register')" class="btn btn-primary w-full">Pilih Pro</button></div>
+      <div class="card p-6 border-2 border-[var(--primary)] relative"><span class="badge badge-primary absolute -top-2.5 left:1/2 -translate-x-1/2">Populer</span><div class="text-xs font-semibold text-[var(--primary)] uppercase mb-1">Pro</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp99K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk content creator aktif</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 100 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua AI Tools</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Content Calendar & Analytics</li></ul><button onclick="showAuth('register')" class="btn btn-primary w-full">Pilih Pro</button></div>
       <div class="card p-6"><div class="text-xs font-semibold text-[var(--accent)] uppercase mb-1">Premium</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp299K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk profesional & agensi</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Unlimited (fair-use)</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua fitur Pro</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Priority Processing</li></ul><button onclick="showAuth('register')" class="btn btn-secondary w-full">Pilih Premium</button></div>
     </div>
   </section>
@@ -253,32 +255,54 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 
 <script>
 // ============================================================
-// STATE & CONFIG
+// CONFIG & SUPABASE INIT
 // ============================================================
+const CONFIG = {
+  DEMO_MODE: !(window.ENV?.AI_API_KEY), 
+};
+
+let supabase = null;
+if (window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY) {
+  supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
+}
+
 const STATE = {
   user: null, profile: null, currentView: 'dashboard',
   contentLibrary: [], calendarItems: [], usage: { today: 0, date: new Date().toDateString() },
   subscriptions: { plan: 'FREE' }, analyticsData: null, calendarDate: new Date()
 };
 
-const CONFIG = {
-  SUPABASE_URL: window.ENV?.SUPABASE_URL || '', SUPABASE_ANON_KEY: window.ENV?.SUPABASE_ANON_KEY || '',
-  AI_API_KEY: window.ENV?.AI_API_KEY || '', AI_API_URL: window.ENV?.AI_API_URL || 'https://api.openai.com/v1/chat/completions',
-  AI_MODEL: window.ENV?.AI_MODEL || 'gpt-4o-mini',
-  DEMO_MODE: !(window.ENV?.AI_API_KEY), USE_SUPABASE: !!(window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY)
-};
-
+// LocalDB Wrapper with Supabase Sync
 const LocalDB = {
-  get(key, def=null) { try { const v = localStorage.getItem('fbpro_'+key); return v ? JSON.parse(v) : def; } catch { return def; } },
-  set(key, val) { localStorage.setItem('fbpro_'+key, JSON.stringify(val)); },
+  async get(key, def=null) { 
+    try {
+      if (supabase && STATE.user) {
+        const { data, error } = await supabase.from('user_data').select('value').eq('user_id', STATE.user.id).eq('key', key).maybeSingle();
+        if (data && data.value) return data.value;
+      }
+      const v = localStorage.getItem('fbpro_'+key); 
+      return v ? JSON.parse(v) : def; 
+    } catch { return def; } 
+  },
+  async set(key, val) { 
+    localStorage.setItem('fbpro_'+key, JSON.stringify(val));
+    if (supabase && STATE.user) {
+      await supabase.from('user_data').upsert({
+        user_id: STATE.user.id,
+        key: key,
+        value: val,
+        updated_at: new Date().toISOString()
+      });
+    }
+  },
   remove(key) { localStorage.removeItem('fbpro_'+key); }
 };
 
 // ============================================================
 // THEME
 // ============================================================
-function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); LocalDB.set('theme', isDark ? 'dark' : 'light'); }
-if (LocalDB.get('theme') === 'dark' || (!LocalDB.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
+function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('fbpro_theme', isDark ? 'dark' : 'light'); }
+if (localStorage.getItem('fbpro_theme') === 'dark' || (!localStorage.getItem('fbpro_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
 
 // ============================================================
 // TOAST & CONFIRM
@@ -300,7 +324,7 @@ function closeConfirm() { document.getElementById('confirmDialog').classList.add
 function confirmAction() { if (confirmCb) confirmCb(); closeConfirm(); }
 
 // ============================================================
-// AUTH
+// SUPABASE AUTH
 // ============================================================
 function showAuth(type='login') { document.getElementById('authModal').classList.remove('hidden'); document.getElementById('authModal').classList.add('flex'); renderAuthForm(type); }
 function closeAuth() { document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').classList.remove('flex'); }
@@ -308,15 +332,12 @@ function closeAuth() { document.getElementById('authModal').classList.add('hidde
 function renderAuthForm(type) {
   const forms = {
     login: { title: 'Masuk ke Akun', subtitle: 'Selamat datang kembali!', fields: [{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password', placeholder:'••••••••', icon:'lock'}], btn: 'Masuk', switch: 'register', switchText: 'Belum punya akun? Daftar' },
-    register: { title: 'Buat Akun Baru', subtitle: 'Gratis 5 generate AI setiap hari', fields: [{name:'name', type:'text', label:'Nama Lengkap', placeholder:'Nama kamu', icon:'user'},{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password (min 6 char)', placeholder:'••••••••', icon:'lock'}], btn: 'Daftar Sekarang', switch: 'login', switchText: 'Sudah punya akun? Masuk' },
-    forgot: { title: 'Lupa Password', subtitle: 'Kami akan kirim link reset ke email kamu', fields: [{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'}], btn: 'Kirim Link Reset', switch: 'login', switchText: 'Kembali ke login' }
+    register: { title: 'Buat Akun Baru', subtitle: 'Gratis 5 generate AI setiap hari', fields: [{name:'name', type:'text', label:'Nama Lengkap', placeholder:'Nama kamu', icon:'user'},{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password (min 6 char)', placeholder:'••••••••', icon:'lock'}], btn: 'Daftar Sekarang', switch: 'login', switchText: 'Sudah punya akun? Masuk' }
   };
   const f = forms[type];
   let html = `<div class="mb-5"><h2 class="font-bold text-xl mb-1">${f.title}</h2><p class="text-sm text-[var(--text-2)]">${f.subtitle}</p></div><form onsubmit="handleAuth(event, '${type}')" class="space-y-3">`;
   f.fields.forEach(field => { html += `<div><label class="text-xs font-semibold text-[var(--text-2)] mb-1.5 block">${field.label}</label><div class="relative"><i data-lucide="${field.icon}" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)]"></i><input type="${field.type}" name="${field.name}" placeholder="${field.placeholder}" required class="input pl-10" ${field.name==='password'?'minlength="6"':''}></div></div>`; });
-  if (type === 'login') html += '<div class="text-right"><button type="button" onclick="renderAuthForm(\'forgot\')" class="text-xs text-[var(--primary)] hover:underline">Lupa password?</button></div>';
   html += `<button type="submit" class="btn btn-primary w-full">${f.btn}</button></form><div class="text-center mt-4 text-sm"><button onclick="renderAuthForm('${f.switch}')" class="text-[var(--primary)] hover:underline font-medium">${f.switchText}</button></div>`;
-  if (CONFIG.DEMO_MODE) html += `<div class="mt-4 p-3 rounded-lg bg-[var(--bg-2)] text-xs text-[var(--text-2)] flex gap-2"><i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5"></i><span>Mode demo aktif. Kamu bisa masuk dengan email & password apa saja. Data disimpan lokal di browser.</span></div>`;
   document.getElementById('authCard').innerHTML = html;
   lucide.createIcons();
 }
@@ -325,48 +346,93 @@ async function handleAuth(e, type) {
   e.preventDefault();
   const fd = new FormData(e.target);
   const data = Object.fromEntries(fd);
-  if (type === 'forgot') { toast('Link reset password telah dikirim (demo mode)', 'info'); renderAuthForm('login'); return; }
-  if (type === 'register') {
-    const users = LocalDB.get('users', []);
-    if (users.find(u => u.email === data.email)) { toast('Email sudah terdaftar', 'error'); return; }
-    const newUser = { id: 'user-' + Date.now(), name: data.name, email: data.email, password: data.password, role: users.length === 0 ? 'admin' : 'user', plan: 'FREE', created_at: new Date().toISOString(), bio: '', avatar_url: '' };
-    users.push(newUser); LocalDB.set('users', users);
-    toast('Akun berhasil dibuat! Silakan masuk.', 'success');
-    renderAuthForm('login');
-  } else if (type === 'login') {
-    const users = LocalDB.get('users', []);
-    const user = users.find(u => u.email === data.email && u.password === data.password);
-    if (!user) { toast('Email atau password salah', 'error'); return; }
-    LocalDB.set('session', { token: 'demo-' + Date.now(), user_id: user.id });
-    STATE.user = user; STATE.profile = { ...user }; delete STATE.profile.password;
-    toast(`Selamat datang, ${user.name}!`, 'success');
-    closeAuth(); initApp();
+  
+  if (!supabase) {
+      toast('Supabase belum terhubung. Cek konfigurasi ENV.', 'error');
+      return;
+  }
+
+  try {
+    if (type === 'register') {
+      const { data: signUpData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: { data: { name: data.name, role: 'user', plan: 'FREE' } }
+      });
+      if (error) throw error;
+      
+      if (signUpData.user) {
+        toast('Akun berhasil dibuat! Silakan masuk.', 'success');
+        renderAuthForm('login');
+      } else {
+        toast('Cek email untuk verifikasi akun kamu.', 'info');
+        renderAuthForm('login');
+      }
+    } else if (type === 'login') {
+      const { data: signInData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password
+      });
+      if (error) throw error;
+      toast(`Selamat datang kembali!`, 'success');
+      closeAuth();
+      await checkSession();
+    }
+  } catch (error) {
+    toast(error.message || 'Terjadi kesalahan', 'error');
   }
 }
 
-function logout() { LocalDB.remove('session'); STATE.user = null; STATE.profile = null; document.getElementById('app').classList.add('hidden'); document.getElementById('landing').classList.remove('hidden'); window.scrollTo(0,0); toast('Berhasil keluar', 'info'); }
-function checkSession() {
-  const session = LocalDB.get('session');
+async function logout() {
+  if (supabase) await supabase.auth.signOut();
+  STATE.user = null; STATE.profile = null; 
+  document.getElementById('app').classList.add('hidden'); 
+  document.getElementById('landing').classList.remove('hidden'); 
+  window.scrollTo(0,0); 
+  toast('Berhasil keluar', 'info'); 
+}
+
+async function checkSession() {
+  if (!supabase) return false;
+  const { data: { session } } = await supabase.auth.getSession();
   if (!session) return false;
-  const users = LocalDB.get('users', []);
-  const user = users.find(u => u.id === session.user_id);
-  if (!user) return false;
-  STATE.user = user; STATE.profile = { ...user }; delete STATE.profile.password;
+
+  const authUser = session.user;
+  STATE.user = {
+    id: authUser.id,
+    email: authUser.email,
+    name: authUser.user_metadata?.name || 'User',
+    role: authUser.user_metadata?.role || 'user',
+    plan: authUser.user_metadata?.plan || 'FREE',
+    bio: authUser.user_metadata?.bio || '',
+    avatar_url: authUser.user_metadata?.avatar_url || ''
+  };
+  STATE.profile = { ...STATE.user };
+  
+  await initApp();
   return true;
 }
 
 // ============================================================
 // INIT APP
 // ============================================================
-function initApp() {
+async function initApp() {
   document.getElementById('landing').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
-  STATE.contentLibrary = LocalDB.get('content_library_' + STATE.user.id, []);
-  STATE.calendarItems = LocalDB.get('calendar_' + STATE.user.id, []);
-  STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
-  if (STATE.usage.date !== new Date().toDateString()) { STATE.usage = { today: 0, date: new Date().toDateString() }; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
+  
+  STATE.contentLibrary = await LocalDB.get('content_library_' + STATE.user.id, []);
+  STATE.calendarItems = await LocalDB.get('calendar_' + STATE.user.id, []);
+  STATE.usage = await LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
+  
+  if (STATE.usage.date !== new Date().toDateString()) { 
+    STATE.usage = { today: 0, date: new Date().toDateString() }; 
+    LocalDB.set('usage_' + STATE.user.id, STATE.usage); 
+  }
+  
   STATE.subscriptions = { plan: STATE.user.plan || 'FREE' };
-  renderSidebar(); updateTopbar(); navigateTo('dashboard');
+  renderSidebar(); 
+  updateTopbar(); 
+  navigateTo('dashboard');
 }
 
 function updateTopbar() {
@@ -386,7 +452,6 @@ const NAV_ITEMS = [
   { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Prompt', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Prompt', icon: 'clapperboard' } ]},
   { group: 'Manajemen', items: [ { id: 'library', label: 'Content Library', icon: 'folder' }, { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' }, { id: 'monetization', label: 'Monetization', icon: 'dollar-sign' }, { id: 'strategy', label: 'AI Content Strategy', icon: 'compass' }, { id: 'pricing', label: 'Paket & Harga', icon: 'credit-card' }, { id: 'profile', label: 'Profil', icon: 'user' } ]}
 ];
-if (STATE.user?.role === 'admin') { NAV_ITEMS.push({ group: 'Admin', items: [ { id: 'admin', label: 'Admin Panel', icon: 'shield' } ]}); }
 
 function renderSidebar() {
   let html = '';
@@ -418,7 +483,7 @@ function navigateTo(view) {
     'video-prompt': ['AI Video Prompt Generator', 'Prompt video AI untuk berbagai format'], 'library': ['Content Library', 'Semua konten tersimpan kamu'],
     'analytics': ['Analytics', 'Performa konten dan rekomendasi AI'], 'monetization': ['Monetization Assistant', 'Strategi monetisasi konten'],
     'strategy': ['AI Content Strategy', 'Strategi konten lengkap dari AI'], 'pricing': ['Paket & Harga', 'Pilih paket yang sesuai kebutuhan'],
-    'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu'], 'admin': ['Admin Panel', 'Kelola pengguna dan sistem']
+    'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu']
   };
   const t = titles[view] || ['FB PRO AI CREATOR', ''];
   document.getElementById('pageTitle').textContent = t[0];
@@ -436,7 +501,7 @@ function renderView(view) {
     'viral-analyzer': renderViralAnalyzer, 'reels-assistant': renderReelsAssistant, 'branding': renderBranding,
     'pillar': renderPillar, 'trend': renderTrend, 'image-prompt': renderImagePrompt, 'video-prompt': renderVideoPrompt,
     'library': renderLibrary, 'analytics': renderAnalytics, 'monetization': renderMonetization, 'strategy': renderStrategy,
-    'pricing': renderPricingView, 'profile': renderProfile, 'admin': renderAdmin
+    'pricing': renderPricingView, 'profile': renderProfile
   };
   if (renderers[view]) renderers[view](main);
   lucide.createIcons();
@@ -493,7 +558,7 @@ function renderDashboardCharts() {
   if (ctx2) new Chart(ctx2, { type: 'doughnut', data: { labels: ['Scheduled', 'Published', 'Draft', 'Ide'], datasets: [{ data: [ STATE.calendarItems.filter(c => c.status === 'SCHEDULED').length || 2, STATE.calendarItems.filter(c => c.status === 'PUBLISHED').length || 5, STATE.calendarItems.filter(c => c.status === 'DRAFT').length || 3, STATE.calendarItems.filter(c => c.status === 'IDE').length || 4 ], backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#94a3b8'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } });
 }
 
-function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Untuk AI realtime, set <code class="bg-[var(--bg-2)] px-1.5 py-0.5 rounded text-xs">AI_API_KEY</code> di environment variables.</div></div></div>`; }
+function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo AI Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Untuk AI realtime, set <code class="bg-[var(--bg-2)] px-1.5 py-0.5 rounded text-xs">AI_API_KEY</code> di environment variables.</div></div></div>`; }
 
 // ============================================================
 // USAGE & AI CALL
@@ -503,9 +568,9 @@ function trackUsage() { STATE.usage.today++; LocalDB.set('usage_' + STATE.user.i
 function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
 
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia.') {
-  if (!CONFIG.DEMO_MODE && CONFIG.AI_API_KEY) {
+  if (!CONFIG.DEMO_MODE && window.ENV?.AI_API_KEY) {
     try {
-      const res = await fetch(CONFIG.AI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${CONFIG.AI_API_KEY}` }, body: JSON.stringify({ model: CONFIG.AI_MODEL, messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }], temperature: 0.7 }) });
+      const res = await fetch(window.ENV.AI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.ENV.AI_API_KEY}` }, body: JSON.stringify({ model: window.ENV.AI_MODEL, messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }], temperature: 0.7 }) });
       const data = await res.json(); return data.choices[0].message.content;
     } catch (e) { toast('Gagal memanggil AI, menggunakan mode demo', 'warning'); }
   }
@@ -678,8 +743,8 @@ function generateDemoCaption(topic, style, tone) {
   const captions = {
     short: `${topic} — tips simpel yang bisa kamu coba hari ini. ${cta}`,
     medium: `Hari ini aku mau bahas tentang ${topic}. Banyak yang nanya, akhirnya aku share aja di sini.\n\nKenapa ini penting? Karena dengan ${topic} yang benar, hasilnya bisa lebih maksimal.\n\nCaranya:\n1. Mulai dari yang mudah dulu\n2. Konsisten tiap hari\n3. Evaluasi tiap minggu\n\nCoba dan kasih tau hasilnya ya!${cta}`,
-    long: `Bicara soal ${topic}, aku inget dulu banget struggle-nya. Waktu itu bingung banget harus mulai dari mana.\n\nAkhirnya aku coba cara ini dan ternyata work banget. Pertama, aku pecah masalah jadi step kecil. Kedua, aku cari mentor atau komunitas. Ketiga, aku konsisten walau awalnya berat.\n\nSetelah 3 bulan, hasilnya mulai kelihatan. Bukan cuma soal hasil akhir, tapi juga proses belajar.\n\nJadi kalau kamu lagi di fase bingung, ingat: mulai aja dulu. Salah-salah dulu nggak apa-apa, yang penting jalan.\n\nKalau ada pertanyaan, komen di bawah ya!${cta}`,
-    story: `"Aku hampir nyerah," gitu kata temenku waktu kita ngobrol soal ${topic}.\n\nDenger itu, aku jadi ingat versi diriku 2 tahun lalu. Waktu itu aku juga hampir nyerah. Udah coba berbagai cara tapi hasilnya nihil.\n\nTapi ada satu hal yang ngubah mindset aku: "Kamu nggak gagal, kamu lagi belajar." Dari situ aku ubah cara. Aku mulai dari kecil, fokus konsistensi.\n\nHasilnya? Bukan cuma soal ${topic} yang akhirnya berhasil, tapi juga aku jadi makin kenal sama diri sendiri.\n\nJadi untuk kamu yang lagi struggle, kamu nggak sendirian. Tetap jalan ya, pelan-pelan nggak apa-apa.${cta}`,
+    long: `Bicara soal ${topic}, aku inget dulu banget struggle-nya. Waktu itu bingung banget harus mulai dari mana.\n\nAkhirnya aku coba cara ini dan ternyata work banget. Pertama, aku pecah masalah jadi step kecil. Kedua, aku cari mentor atau komunitas. Ketiga, aku konsisten walau awalnya berat.\n\nSetelah 3 bulan, hasilnya mulai kelihatan. Bukan cuma soal hasil akhir, tapi juga proses belajar.\n\nJadi kalau kamu lagi di fase bingung, inget: mulai aja dulu. Salah-salah dulu nggak apa-apa, yang penting jalan.\n\nKalau ada pertanyaan, komen di bawah ya!${cta}`,
+    story: `"Aku hampir nyerah," gitu kata temenku waktu kita ngobrol soal ${topic}.\n\nDenger itu, aku jadi inget versi diriku 2 tahun lalu. Waktu itu aku juga hampir nyerah. Udah coba berbagai cara tapi hasilnya nihil.\n\nTapi ada satu hal yang ngubah mindset aku: "Kamu nggak gagal, kamu lagi belajar." Dari situ aku ubah cara. Aku mulai dari kecil, fokus konsistensi.\n\nHasilnya? Bukan cuma soal ${topic} yang akhirnya berhasil, tapi juga aku jadi makin kenal sama diri sendiri.\n\nJadi untuk kamu yang lagi struggle, kamu nggak sendirian. Tetap jalan ya, pelan-pelan nggak apa-apa.${cta}`,
     edu: `📚 Edukasi: ${topic}\n\nKenapa ${topic} itu penting? Karena banyak orang misunderstanding soal ini.\n\n1. Definisi: ${topic} bukan hanya tentang hasil, tapi proses.\n2. Manfaat: Kalau dipahami dengan benar, ${topic} bisa meningkatkan kualitas hidup.\n3. Cara mulai: Pecah jadi step kecil, fokus konsistensi, ukur progres.\n\nSimpan postingan ini supaya kamu bisa baca ulang kapan saja!${cta}`,
     promo: `🔥 PROMO TERBATAS! 🔥\n\nSesuai buat kamu yang lagi butuh ${topic} tapi bingung harus mulai dari mana.\n\nApa yang kamu dapat:\n✅ Panduan lengkap step-by-step\n✅ Template siap pakai\n✅ Konsultasi 1-on-1\n\nHarga normal Rp 499K, hari ini cuma Rp 199K!\n\n👉 Klik link di bio untuk klaim${cta}`
   };
@@ -827,9 +892,8 @@ function exportCalendarCSV() {
 }
 
 // ============================================================
-// HASHTAG, SCORE, REWRITER, VIRAL ANALYZER, ETC...
+// OTHER TOOLS (HASHTAG, SCORE, REWRITER, VIRAL, ETC)
 // ============================================================
-// (For brevity in this single block, the rest of the tools follow the same corrected pattern)
 function renderHashtag(main) {
   main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
     <div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="hash" class="w-4 h-4 text-[var(--accent)]"></i> AI Hashtag Generator</h3><div class="flex gap-2"><input id="hsh-topic" class="input flex-1" placeholder="Masukkan topik, contoh: kuliner sehat"><button onclick="generateHashtag()" id="hsh-btn" class="btn btn-primary"><i data-lucide="hash" class="w-4 h-4"></i> Generate</button></div></div><div id="hsh-result"></div>`;
@@ -992,24 +1056,14 @@ function renderPricingView(main) {
   main.innerHTML = `<div class="card p-5 mb-4 flex items-center justify-between"><div><div class="text-xs text-[var(--text-3)] mb-1">Paket saat ini</div><div class="text-2xl font-extrabold gradient-text">${STATE.subscriptions.plan || 'FREE'}</div></div></div><div class="grid md:grid-cols-3 gap-5">${['FREE','PRO','PREMIUM'].map(p => `<div class="card p-6 ${STATE.subscriptions.plan === p ? 'border-2 border-[var(--primary)]' : ''}"><div class="text-xs font-semibold uppercase mb-1">${p}</div><button onclick="upgradePlan('${p}')" class="btn ${STATE.subscriptions.plan === p ? 'btn-secondary' : 'btn-primary'} w-full">${STATE.subscriptions.plan === p ? 'Aktif' : 'Upgrade'}</button></div>`).join('')}</div>`;
   lucide.createIcons();
 }
-function upgradePlan(plan) { STATE.subscriptions.plan = plan; const users = LocalDB.get('users', []); const u = users.find(x => x.id === STATE.user.id); if (u) { u.plan = plan; LocalDB.set('users', users); STATE.user = u; } updateTopbar(); toast(`Paket diubah ke ${plan}`, 'success'); renderPricingView(document.getElementById('mainContent')); }
+function upgradePlan(plan) { STATE.subscriptions.plan = plan; if (STATE.user) { STATE.user.plan = plan; LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); toast(`Paket diubah ke ${plan}`, 'success'); renderPricingView(document.getElementById('mainContent')); }
 
 function renderProfile(main) {
   main.innerHTML = `<div class="grid lg:grid-cols-3 gap-5"><div class="card p-5 text-center"><div class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-[var(--bg-2)]" id="pf-avatar">${STATE.profile.avatar_url ? `<img src="${STATE.profile.avatar_url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center gradient-bg text-white text-3xl font-bold">${(STATE.profile.name||'U').charAt(0).toUpperCase()}</div>`}</div><h3 class="font-bold text-lg">${STATE.profile.name}</h3><p class="text-sm text-[var(--text-2)] mb-2">${STATE.profile.email}</p><span class="badge badge-primary">${STATE.user.role?.toUpperCase()}</span><div class="mt-4"><label class="btn btn-secondary btn-sm cursor-pointer"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Foto<input type="file" accept="image/*" class="hidden" onchange="uploadAvatar(event)"></label></div></div><div class="card p-5 lg:col-span-2"><h3 class="font-bold mb-4">Edit Profil</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Nama</label><input id="pf-name" class="input" value="${STATE.profile.name || ''}"></div><div><label class="text-xs font-semibold mb-1.5 block">Bio</label><textarea id="pf-bio" class="textarea" placeholder="Ceritakan tentang dirimu">${STATE.profile.bio || ''}</textarea></div><button onclick="saveProfile()" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button></div></div></div>`;
   lucide.createIcons();
 }
-function uploadAvatar(e) { const file = e.target.files[0]; if (!file) return; if (file.size > 2*1024*1024) { toast('Ukuran file max 2MB', 'warning'); return; } const reader = new FileReader(); reader.onload = (ev) => { STATE.profile.avatar_url = ev.target.result; const users = LocalDB.get('users', []); const u = users.find(x => x.id === STATE.user.id); if (u) { u.avatar_url = ev.target.result; LocalDB.set('users', users); STATE.user = u; } updateTopbar(); renderProfile(document.getElementById('mainContent')); toast('Foto profil diperbarui', 'success'); }; reader.readAsDataURL(file); }
-function saveProfile() { const name = document.getElementById('pf-name').value.trim(); const bio = document.getElementById('pf-bio').value.trim(); if (!name) { toast('Nama tidak boleh kosong', 'warning'); return; } const users = LocalDB.get('users', []); const u = users.find(x => x.id === STATE.user.id); if (u) { u.name = name; u.bio = bio; LocalDB.set('users', users); STATE.user = u; STATE.profile = {...u}; delete STATE.profile.password; } updateTopbar(); toast('Profil disimpan', 'success'); }
-
-function renderAdmin(main) {
-  if (STATE.user.role !== 'admin') { main.innerHTML = emptyState('Akses Ditolak', 'Halaman ini khusus admin', 'shield-x'); return; }
-  const users = LocalDB.get('users', []);
-  main.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">${[['Total Pengguna',users.length,'users','primary'],['Pro',users.filter(u => u.plan === 'PRO').length,'crown','warning'],['Premium',users.filter(u => u.plan === 'PREMIUM').length,'diamond','accent'],['Total Generate',users.reduce((s,u) => s + (LocalDB.get('usage_'+u.id, {today:0}).today || 0), 0),'zap','success']].map(([label,val,icon,color]) => `<div class="card p-4"><div class="w-9 h-9 rounded-lg flex items-center justify-center mb-2" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-4 h-4"></i></div><div class="text-2xl font-extrabold">${val}</div><div class="text-xs text-[var(--text-2)]">${label}</div></div>`).join('')}</div><div class="card p-5 mb-5"><h3 class="font-bold mb-4">Daftar Pengguna</h3><div class="overflow-x-auto"><table class="w-full text-sm min-w-[600px]"><thead><tr class="text-left text-xs text-[var(--text-3)] border-b border-[var(--border)]"><th class="py-2">Nama</th><th>Email</th><th>Role</th><th>Paket</th><th>Aksi</th></tr></thead><tbody>${users.map(u => `<tr class="border-b border-[var(--border)]"><td class="py-3 font-medium">${u.name}</td><td class="text-[var(--text-2)]">${u.email}</td><td><span class="badge badge-${u.role === 'admin' ? 'danger' : 'primary'}">${u.role}</span></td><td><span class="badge badge-${u.plan === 'PREMIUM' ? 'accent' : u.plan === 'PRO' ? 'warning' : 'gray'}">${u.plan || 'FREE'}</span></td><td><button onclick="adminChangePlan('${u.id}')" class="btn btn-ghost btn-sm"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>${u.id !== STATE.user.id ? `<button onclick="adminDeleteUser('${u.id}')" class="btn btn-ghost btn-sm text-[var(--danger)]"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}</td></tr>`).join('')}</tbody></table></div></div>`;
-  lucide.createIcons();
-}
-function adminDeleteUser(id) { showConfirm('Hapus Pengguna?', 'Akun akan dihapus.', () => { let users = LocalDB.get('users', []); users = users.filter(u => u.id !== id); LocalDB.set('users', users); toast('Pengguna dihapus', 'success'); renderAdmin(document.getElementById('mainContent')); }); }
-function adminChangePlan(id) { const users = LocalDB.get('users', []); const u = users.find(x => x.id === id); if (!u) return; const modal = document.createElement('div'); modal.className = 'fixed inset-0 z-[80] flex items-center justify-center modal-backdrop p-4'; modal.innerHTML = `<div class="card p-6 w-full max-w-sm animate-scale"><h3 class="font-bold mb-4">Ubah Paket — ${u.name}</h3><select id="ad-plan" class="select mb-4"><option ${u.plan === 'FREE' ? 'selected' : ''}>FREE</option><option ${u.plan === 'PRO' ? 'selected' : ''}>PRO</option><option ${u.plan === 'PREMIUM' ? 'selected' : ''}>PREMIUM</option></select><div class="flex gap-2"><button onclick="this.closest('.fixed').remove()" class="btn btn-secondary flex-1">Batal</button><button onclick="confirmChangePlan('${id}')" class="btn btn-primary flex-1">Simpan</button></div></div>`; document.body.appendChild(modal); }
-function confirmChangePlan(id) { const plan = document.getElementById('ad-plan').value; const users = LocalDB.get('users', []); const u = users.find(x => x.id === id); if (u) { u.plan = plan; LocalDB.set('users', users); } document.querySelector('.fixed').remove(); toast('Paket diperbarui', 'success'); renderAdmin(document.getElementById('mainContent')); }
+function uploadAvatar(e) { const file = e.target.files[0]; if (!file) return; if (file.size > 2*1024*1024) { toast('Ukuran file max 2MB', 'warning'); return; } const reader = new FileReader(); reader.onload = async (ev) => { STATE.profile.avatar_url = ev.target.result; if (STATE.user) { STATE.user.avatar_url = ev.target.result; LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); renderProfile(document.getElementById('mainContent')); toast('Foto profil diperbarui', 'success'); }; reader.readAsDataURL(file); }
+async function saveProfile() { const name = document.getElementById('pf-name').value.trim(); const bio = document.getElementById('pf-bio').value.trim(); if (!name) { toast('Nama tidak boleh kosong', 'warning'); return; } if (STATE.user) { STATE.user.name = name; STATE.user.bio = bio; STATE.profile = {...STATE.user}; await LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); toast('Profil disimpan', 'success'); }
 
 // ============================================================
 // UTILITIES
@@ -1026,26 +1080,44 @@ function saveEditedItem() { const item = window._edItem; if (!item) return; item
 // ============================================================
 // LANDING SETUP
 // ============================================================
-const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Saat ini mode demo. Untuk AI realtime, set API key di environment variables.'], ['Apakah data saya aman?', 'Ya. Password di-hash, data terisolasi per user_id.']];
+const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Saat ini mode demo. Untuk AI realtime, set API key di environment variables.'], ['Apakah data saya aman?', 'Ya. Data terenkripsi dan terisolasi per user.']];
 document.getElementById('faqList').innerHTML = faqs.map(([q, a]) => `<div class="card p-4"><details><summary class="font-semibold cursor-pointer flex items-center justify-between text-sm">${q} <i data-lucide="chevron-down" class="w-4 h-4"></i></summary><p class="text-sm text-[var(--text-2)] mt-3">${a}</p></details></div>`).join('');
 
-const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Prompt','image','primary'],['video-prompt','AI Video Prompt','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
+const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Prompt','image','primary'],['video-prompt','AI Video Prompt','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent']];
 document.getElementById('toolsGrid').innerHTML = allTools.map(([id, label, icon, color]) => `<button onclick="showAuth('register')" class="card p-4 text-left hover:scale-[1.02] transition-transform"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-5 h-5"></i></div><div class="font-semibold text-sm">${label}</div></button>`).join('');
 
 // ============================================================
 // INIT
 // ============================================================
-window.addEventListener('DOMContentLoaded', () => { lucide.createIcons(); if (checkSession()) initApp(); else document.getElementById('landing').classList.remove('hidden'); });
+window.addEventListener('DOMContentLoaded', async () => { 
+  lucide.createIcons(); 
+  if (supabase) {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        await checkSession();
+      } else if (event === 'SIGNED_OUT') {
+        STATE.user = null; STATE.profile = null;
+        document.getElementById('app').classList.add('hidden');
+        document.getElementById('landing').classList.remove('hidden');
+      }
+    });
+    const isLogged = await checkSession();
+    if (!isLogged) document.getElementById('landing').classList.remove('hidden');
+  } else {
+    document.getElementById('landing').classList.remove('hidden');
+    toast('Mode Demo: Supabase belum dikonfigurasi.', 'warning');
+  }
+});
 document.getElementById('authModal')?.addEventListener('click', (e) => { if (e.target.id === 'authModal') closeAuth(); });
 </script>
 
 <script>
 window.ENV = {
-  // SUPABASE_URL: 'https://vsofvyruthaadkjylybp.supabase.co',
-  // SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb2Z2eXJ1dGhhYWRranlseWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1OTYsImV4cCI6MjEwNTAzNTU5Nn0.3Dd5QnaO6uoR-gedW4hKTuw6DDIRdM8EYSJ2NhxHQEc',
-  // AI_API_KEY: 'your-openai-api-key',
-  // AI_API_URL: 'https://api.openai.com/v1/chat/completions',
-  // AI_MODEL: 'gpt-4o-mini'
+  SUPABASE_URL: 'https://vsofvyruthaadkjylybp.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb2Z2eXJ1dGhhYWRranlseWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1OTYsImV4cCI6MjEwNTAzNTU5Nn0.3Dd5QnaO6uoR-gedW4hKTuw6DDIRdM8EYSJ2NhxHQEc',
+  AI_API_KEY: '',
+  AI_API_URL: 'https://api.openai.com/v1/chat/completions',
+  AI_MODEL: 'gpt-4o-mini'
 };
 </script>
 </body>
