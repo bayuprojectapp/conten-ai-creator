@@ -253,48 +253,21 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 <div id="confirmDialog" class="fixed inset-0 z-[90] hidden items-center justify-center modal-backdrop p-4"><div class="card p-6 w-full max-w-sm animate-scale"><div class="w-12 h-12 rounded-full bg-[var(--danger)] bg-opacity-15 flex items-center justify-center mb-4 mx-auto"><i data-lucide="alert-triangle" class="w-6 h-6 text-[var(--danger)]"></i></div><h3 class="font-bold text-lg text-center mb-2" id="confirmTitle">Konfirmasi</h3><p class="text-sm text-[var(--text-2)] text-center mb-5" id="confirmMsg">Apakah kamu yakin?</p><div class="flex gap-2"><button onclick="closeConfirm()" class="btn btn-secondary flex-1">Batal</button><button onclick="confirmAction()" class="btn btn-danger flex-1">Hapus</button></div></div></div>
 
 <script>
+// ============================================================
+// ENVIRONMENT & SUPABASE INIT
+// ============================================================
 window.ENV = {
   SUPABASE_URL: 'https://vsofvyruthaadkjylybp.supabase.co',
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb2Z2eXJ1dGhhYWRranlseWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1OTYsImV4cCI6MjEwNTAzNTU5Nn0.3Dd5QnaO6uoR-gedW4hKTuw6DDIRdM8EYSJ2NhxHQEc',
-  // HAPUS AI_API_KEY DARI SINI!
-  // Ganti dengan URL Edge Function yang baru kamu buat tadi:
   AI_API_URL: 'https://vsofvyruthaadkjylybp.supabase.co/functions/v1/generate-ai',
   AI_MODEL: 'gpt-4o-mini'
 };
 
-// ============================================================
-// USAGE & AI CALL (TERAMAN)
-// ============================================================
-function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
-function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
-function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
-
-async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
-  // Karena API Key sudah di Supabase, kita bisa langsung true (tidak ada mode demo lagi jika backend siap)
-  if (window.ENV.AI_API_URL) {
-    try {
-      const res = await fetch(window.ENV.AI_API_URL, { 
-        method: 'POST', 
-        headers: { 
-          'Content-Type': 'application/json',
-          // Supabase Edge Function butuh Authorization header untuk verifikasi pemanggil
-          'Authorization': `Bearer ${window.ENV.SUPABASE_ANON_KEY}` 
-        }, 
-        body: JSON.stringify({ prompt, system }) 
-      });
-      const data = await res.json();
-      
-      if (data.error) throw new Error(data.error.message || data.error);
-      
-      return data.choices[0].message.content;
-    } catch (e) { 
-      toast('Gagal memanggil AI: ' + e.message, 'warning'); 
-      return null;
-    }
-  }
-  await new Promise(r => setTimeout(r, 800));
-  return null;
+let sb = null;
+if (window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY && window.supabase) {
+  sb = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
 }
+
 // ============================================================
 // STATE & CONFIG
 // ============================================================
@@ -305,15 +278,15 @@ const STATE = {
 };
 
 const CONFIG = {
-  DEMO_MODE: !(window.ENV?.AI_API_KEY) // Catatan: AI_API_KEY sudah kamu hapus, jadi ini akan true (Demo AI Aktif)
+  DEMO_MODE: !(window.ENV?.AI_API_KEY) // Demo mode aktif karena tidak ada AI_API_KEY di ENV
 };
 
-// === TAMBAHKAN INI UNTUK MENGHUBUNGKAN KE SUPABASE ===
-let sb = null;
-if (window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY) {
-  sb = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
-}
-// ======================================================
+const LocalDB = {
+  get(key, def=null) { try { const v = localStorage.getItem('fbpro_'+key); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set(key, val) { localStorage.setItem('fbpro_'+key, JSON.stringify(val)); },
+  remove(key) { localStorage.removeItem('fbpro_'+key); }
+};
+
 // ============================================================
 // THEME
 // ============================================================
@@ -440,11 +413,10 @@ async function checkSession() {
       let profile = null;
       try {
         const { data: prof, error: profileError } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-        if (!profileError) profile = prof;
+        if (!profileError && prof) profile = prof;
       } catch (e) { console.warn("Profiles table might not exist:", e.message); }
 
       if (!profile) {
-        // Buat default di memori jika tabel belum ada
         profile = {
           id: userData.user.id,
           name: userData.user.user_metadata?.name || 'User',
@@ -467,6 +439,7 @@ async function checkSession() {
       const user = users.find(u => u.id === session.user_id);
       if (!user) return false;
       STATE.user = user; STATE.profile = { ...user }; delete STATE.profile.password;
+      await initApp();
       return true;
     }
   } catch (err) {
@@ -474,6 +447,7 @@ async function checkSession() {
     return false;
   }
 }
+
 // ============================================================
 // INIT APP
 // ============================================================
@@ -484,7 +458,6 @@ async function initApp() {
     
     if (sb && STATE.user) {
       try {
-        // Ambil data dari Supabase
         const { data: contents, error: err1 } = await sb.from('content_library').select('*').eq('owner_id', STATE.user.id);
         if (err1) throw err1;
         STATE.contentLibrary = contents || [];
@@ -494,24 +467,24 @@ async function initApp() {
         STATE.calendarItems = calItems || [];
       } catch (dbErr) {
         console.error("Database Error:", dbErr.message);
-        toast("Data gagal dimuat dari Supabase, periksa RLS Policy.", "warning");
-        // Tetap gunakan data kosong agar tidak blank
+        toast("Data gagal dimuat dari Supabase. Pastikan tabel & RLS sudah dibuat.", "warning");
         STATE.contentLibrary = [];
         STATE.calendarItems = [];
       }
-    } else {
+    } else if (STATE.user) {
       STATE.contentLibrary = LocalDB.get('content_library_' + STATE.user.id, []);
       STATE.calendarItems = LocalDB.get('calendar_' + STATE.user.id, []);
     }
     
-    // INI BAGIAN YANG DIPERBAIKI:
-    STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
-    if (STATE.usage.date !== new Date().toDateString()) { 
-      STATE.usage = { today: 0, date: new Date().toDateString() }; 
-      LocalDB.set('usage_' + STATE.user.id, STATE.usage); 
+    if (STATE.user) {
+      STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
+      if (STATE.usage.date !== new Date().toDateString()) { 
+        STATE.usage = { today: 0, date: new Date().toDateString() }; 
+        LocalDB.set('usage_' + STATE.user.id, STATE.usage); 
+      }
     }
     
-    STATE.subscriptions = { plan: STATE.user.plan || 'FREE' };
+    STATE.subscriptions = { plan: STATE.user?.plan || 'FREE' };
     renderSidebar(); 
     updateTopbar(); 
     navigateTo('dashboard');
@@ -520,12 +493,13 @@ async function initApp() {
     toast("Terjadi error saat memuat aplikasi: " + err.message, "error");
   }
 }
+
 function updateTopbar() {
-  document.getElementById('topbarName').textContent = STATE.profile.name || 'User';
+  document.getElementById('topbarName').textContent = STATE.profile?.name || 'User';
   document.getElementById('userPackageLabel').textContent = (STATE.subscriptions.plan || 'FREE') + ' Plan';
   const avatar = document.getElementById('topbarAvatar');
-  if (STATE.profile.avatar_url) avatar.innerHTML = `<img src="${STATE.profile.avatar_url}" class="w-full h-full object-cover">`;
-  else avatar.innerHTML = `<div class="w-full h-full flex items-center justify-center gradient-bg text-white text-xs font-bold">${(STATE.profile.name||'U').charAt(0).toUpperCase()}</div>`;
+  if (STATE.profile?.avatar_url) avatar.innerHTML = `<img src="${STATE.profile.avatar_url}" class="w-full h-full object-cover">`;
+  else avatar.innerHTML = `<div class="w-full h-full flex items-center justify-center gradient-bg text-white text-xs font-bold">${(STATE.profile?.name||'U').charAt(0).toUpperCase()}</div>`;
 }
 
 // ============================================================
@@ -647,29 +621,25 @@ function renderDashboardCharts() {
 function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo AI Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Data Auth & Library tetap masuk Supabase.</div></div></div>`; }
 
 // ============================================================
-// USAGE & AI CALL (INTEGRASI NYATA)
+// USAGE & AI CALL
 // ============================================================
 function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
 function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
 function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
 
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
-  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_KEY) {
+  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL) {
     try {
       const res = await fetch(window.ENV.AI_API_URL, { 
         method: 'POST', 
         headers: { 
           'Content-Type': 'application/json', 
-          'Authorization': `Bearer ${window.ENV.AI_API_KEY}` 
+          'Authorization': `Bearer ${window.ENV.SUPABASE_ANON_KEY}` 
         }, 
-        body: JSON.stringify({ 
-          model: window.ENV.AI_MODEL, 
-          messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }], 
-          temperature: 0.7 
-        }) 
+        body: JSON.stringify({ prompt, system }) 
       });
       const data = await res.json();
-      if(data.error) throw new Error(data.error.message);
+      if(data.error) throw new Error(data.error.message || data.error);
       return data.choices[0].message.content;
     } catch (e) { 
       toast('Gagal memanggil AI: ' + e.message, 'warning'); 
@@ -677,7 +647,7 @@ async function callAI(prompt, system='Kamu adalah asisten content creator Facebo
     }
   }
   await new Promise(r => setTimeout(r, 800));
-  return null; // Return null jika demo mode, agar UI merender dummy text
+  return null;
 }
 
 // ============================================================
@@ -711,9 +681,7 @@ async function generateContent() {
   trackUsage();
   
   let html = '';
-  // Jika AI mengembalikan hasil, kita tampilkan. Jika null (demo), kita pakai teks dummy.
   if (aiResult) {
-    // Sederhana: Kita pecah per baris
     const lines = aiResult.split('\n').filter(l => l.trim() !== '');
     lines.slice(0, 5).forEach((line, i) => {
       const safeText = line.replace(/'/g,"\\'").replace(/"/g,'&quot;');
@@ -730,7 +698,6 @@ async function generateContent() {
       </div>`;
     });
   } else {
-    // Fallback Demo Mode
     for (let i = 0; i < 5; i++) {
       const title = `Ide konten tentang ${topic} - Bagian ${i+1}`;
       const hook = `${topic} itu nggak sesulit yang kamu bayangkan`;
@@ -757,7 +724,7 @@ async function generateContent() {
 }
 
 // ============================================================
-// HOOKS & LAINNYA (DISEDERHANAKAN TAPI SUDAH TERHUBUNG AI)
+// HOOKS & OTHER GENERATORS
 // ============================================================
 function renderHookGenerator(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-[var(--accent)]"></i> AI Hook Generator</h3><input id="hg-topic" class="input mb-3" placeholder="Topik"><button onclick="generateHooks()" id="hg-btn" class="btn btn-primary"><i data-lucide="zap" class="w-4 h-4"></i> Generate</button></div><div id="hg-result"></div>`; }
 async function generateHooks() {
@@ -827,7 +794,7 @@ async function generateIdeKonten() {
 }
 
 // ============================================================
-// CALENDAR (SUPABASE INTEGRATION)
+// CALENDAR
 // ============================================================
 function renderCalendar(main) {
   const date = STATE.calendarDate;
@@ -1066,7 +1033,7 @@ async function generateVideoPrompt() {
 }
 
 // ============================================================
-// LIBRARY (SUPABASE INTEGRATION)
+// LIBRARY
 // ============================================================
 function renderLibrary(main) {
   main.innerHTML = `<div class="card p-5 mb-5"><div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="folder" class="w-4 h-4 text-[var(--primary)]"></i> Content Library</h3><button onclick="exportLibraryCSV()" class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV</button></div><div class="flex flex-wrap gap-2 mb-4"><input id="lb-search" class="input flex-1 min-w-[200px]" placeholder="Cari konten..." oninput="filterLibrary()"><select id="lb-filter" class="select" style="width: auto" onchange="filterLibrary()"><option value="">Semua Tipe</option><option value="ide">Ide</option><option value="hook">Hook</option><option value="caption">Caption</option><option value="script">Script</option></select></div><div id="lb-list"></div></div>`;
@@ -1131,6 +1098,7 @@ async function generateStrategy() {
   document.getElementById('st-btn').disabled = true; 
   const aiResult = await callAI(`Buat strategi konten Facebook 1 bulan untuk niche ${t}. Sertakan pilar konten dan jadwal posting.`); 
   trackUsage(); 
+  // Typo fix disini (aiResult bukan text)
   const text = aiResult ? `<div class="whitespace-pre-line">${aiResult}</div>` : `<div class="card p-5">Pilar 1: Edukasi ${t}. Jadwal: Senin, Rabu, Jumat.</div>`;
   document.getElementById('st-result').innerHTML = `<div class="card p-5 text-sm">${text}</div>`; 
   lucide.createIcons(); document.getElementById('st-btn').disabled=false; 
