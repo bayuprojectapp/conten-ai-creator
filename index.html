@@ -630,29 +630,23 @@ function canGenerate() {
   return true; 
 }
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
-  // Karena API Key sudah di Supabase Edge Function, kita panggil langsung URL-nya
-  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL) {
+  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL && sb) {
     try {
-      const res = await fetch(window.ENV.AI_API_URL, { 
-        method: 'POST', 
-        headers: { 
-          'Content-Type': 'application/json',
-          // Supabase Edge Function butuh Authorization header
-          'Authorization': `Bearer ${window.ENV.SUPABASE_ANON_KEY}` 
-        }, 
-        body: JSON.stringify({ prompt, system }) 
+      // Gunakan fungsi resmi Supabase
+      const { data, error } = await sb.functions.invoke('generate-ai', {
+        body: { prompt, system }
       });
-      const data = await res.json();
-      
+
+      if (error) throw error;
       if (data.error) throw new Error(data.error.message || data.error);
       
       return data.choices[0].message.content;
     } catch (e) { 
+      console.error("AI Fetch Error:", e);
       toast('Gagal memanggil AI: ' + e.message, 'warning'); 
       return null;
     }
   }
-  // Fallback jika tidak ada URL AI
   await new Promise(r => setTimeout(r, 800));
   return null;
 }
