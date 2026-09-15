@@ -625,8 +625,10 @@ function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[v
 // ============================================================
 function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
 function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
-function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
-
+function canGenerate() { 
+  // SEMENTARA DIMATIKAN UNTUK TESTING
+  return true; 
+}
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
   // Karena API Key sudah di Supabase Edge Function, kita panggil langsung URL-nya
   if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL) {
