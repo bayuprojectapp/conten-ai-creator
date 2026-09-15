@@ -94,7 +94,6 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 .loading-dots span:nth-child(3) { animation-delay: .4s; }
 [data-tooltip] { position: relative; }
 [data-tooltip]:hover::after { content: attr(data-tooltip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 4px 8px; border-radius: 6px; font-size: 11px; white-space: nowrap; margin-bottom: 4px; z-index: 100; }
-@media (max-width: 1023px) { .sidebar { position: fixed; left: -300px; top: 0; bottom: 0; z-index: 60; transition: left .3s; width: 260px; } .sidebar.open { left: 0; } }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .hero-pattern { background-image: radial-gradient(circle at 20% 30%, color-mix(in srgb, var(--primary) 15%, transparent), transparent 40%), radial-gradient(circle at 80% 20%, color-mix(in srgb, var(--accent) 15%, transparent), transparent 40%), radial-gradient(circle at 50% 80%, color-mix(in srgb, var(--primary) 10%, transparent), transparent 40%); }
 .score-ring { transform: rotate(-90deg); }
@@ -105,6 +104,23 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 .nav-backdrop { background: rgba(0,0,0,.5); position: fixed; inset: 0; z-index: 50; opacity: 0; pointer-events: none; transition: opacity .3s; }
 .nav-backdrop.show { opacity: 1; pointer-events: auto; }
 .skeleton { background: linear-gradient(90deg, var(--bg-2) 25%, var(--border) 50%, var(--bg-2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+
+/* PERBAIKAN SIDEBAR MOBILE */
+@media (max-width: 1023px) { 
+  .sidebar { 
+    position: fixed; 
+    left: -300px; 
+    top: 0; 
+    bottom: 0; 
+    z-index: 60; 
+    transition: left .3s; 
+    width: 260px; 
+    display: flex !important; /* Paksa tampil saat di-toggle */
+  } 
+  .sidebar.open { 
+    left: 0; 
+  } 
+}
 </style>
 </head>
 <body>
@@ -225,7 +241,7 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 
 <!-- ====== APP (DASHBOARD) ====== -->
 <div id="app" class="hidden min-h-screen">
-  <aside class="sidebar w-[260px] bg-[var(--surface)] border-r border-[var(--border)] flex flex-col fixed inset-y-0 z-40">
+  <aside class="sidebar hidden lg:flex w-[260px] bg-[var(--surface)] border-r border-[var(--border)] flex-col fixed inset-y-0 z-40">
     <div class="h-16 flex items-center gap-3 px-5 border-b border-[var(--border)]"><div class="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center text-white"><i data-lucide="sparkles" class="w-5 h-5"></i></div><div><div class="font-bold text-sm leading-tight">FB PRO AI CREATOR</div><div class="text-[10px] text-[var(--text-3)]" id="userPackageLabel">Free Plan</div></div></div>
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="sidebarNav"></nav>
     <div class="p-3 border-t border-[var(--border)]"><button onclick="logout()" class="sidebar-item w-full"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div>
@@ -522,8 +538,25 @@ function renderSidebar() {
   document.getElementById('sidebarNav').innerHTML = html;
   lucide.createIcons();
 }
-function openSidebar() { document.querySelector('.sidebar').classList.add('open'); document.getElementById('navBackdrop').classList.add('show'); }
-function closeSidebar() { document.querySelector('.sidebar').classList.remove('open'); document.getElementById('navBackdrop').classList.remove('show'); }
+
+function openSidebar() { 
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.remove('hidden'); 
+    setTimeout(() => {
+      sidebar.classList.add('open');
+    }, 10);
+  }
+  document.getElementById('navBackdrop').classList.add('show'); 
+} 
+
+function closeSidebar() { 
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.remove('open'); 
+  }
+  document.getElementById('navBackdrop').classList.remove('show'); 
+}
 
 function navigateTo(view) {
   STATE.currentView = view;
@@ -1124,7 +1157,6 @@ async function generateStrategy() {
   document.getElementById('st-btn').disabled = true; 
   const aiResult = await callAI(`Buat strategi konten Facebook 1 bulan untuk niche ${t}. Sertakan pilar konten dan jadwal posting.`); 
   trackUsage(); 
-  // Typo fix disini (aiResult bukan text)
   const text = aiResult ? `<div class="whitespace-pre-line">${aiResult}</div>` : `<div class="card p-5">Pilar 1: Edukasi ${t}. Jadwal: Senin, Rabu, Jumat.</div>`;
   document.getElementById('st-result').innerHTML = `<div class="card p-5 text-sm">${text}</div>`; 
   lucide.createIcons(); document.getElementById('st-btn').disabled=false; 
