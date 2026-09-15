@@ -113,7 +113,6 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
   display: flex;
   flex-direction: column;
   position: fixed;
-  inset-y: 0;
   top: 0;
   bottom: 0;
   z-index: 40;
@@ -128,6 +127,16 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
     left: 0 !important; 
   } 
 }
+
+/* GAYA CHAT (CHATGPT STYLE) */
+.chat-container { display: flex; flex-direction: column; height: calc(100vh - 140px); }
+.chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+.chat-bubble { max-width: 85%; padding: 14px 18px; border-radius: 16px; line-height: 1.5; font-size: 14px; white-space: pre-wrap; word-wrap: break-word; animation: fadeIn .3s ease both; }
+.chat-bubble.user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border-bottom-right-radius: 4px; box-shadow: 0 4px 12px rgba(37,99,235,.15); }
+.chat-bubble.ai { align-self: flex-start; background: var(--surface); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,.05); }
+.chat-input-area { padding: 1rem; border-top: 1px solid var(--border); background: var(--surface); display: flex; gap: 0.5rem; align-items: center; border-radius: 0 0 16px 16px; }
+.chat-input-area textarea { flex: 1; resize: none; min-height: 44px; max-height: 120px; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; outline: none; transition: border-color .2s; }
+.chat-input-area textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent); }
 </style>
 </head>
 <body>
@@ -248,7 +257,6 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 
 <!-- ====== APP (DASHBOARD) ====== -->
 <div id="app" class="hidden min-h-screen">
-  <!-- Kelas Tailwind 'hidden' dan 'lg:flex' dihapus dari aside agar tidak bentrok dengan CSS mutlak di atas -->
   <aside class="sidebar">
     <div class="h-16 flex items-center gap-3 px-5 border-b border-[var(--border)]"><div class="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center text-white"><i data-lucide="sparkles" class="w-5 h-5"></i></div><div><div class="font-bold text-sm leading-tight">FB PRO AI CREATOR</div><div class="text-[10px] text-[var(--text-3)]" id="userPackageLabel">Free Plan</div></div></div>
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="sidebarNav"></nav>
@@ -530,10 +538,10 @@ function updateTopbar() {
 // SIDEBAR & NAVIGATION
 // ============================================================
 const NAV_ITEMS = [
-  { group: 'Utama', items: [ { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' }, { id: 'content-generator', label: 'AI Content Generator', icon: 'wand-2' }, { id: 'hook-generator', label: 'AI Hook Generator', icon: 'zap' }, { id: 'caption-generator', label: 'AI Caption Generator', icon: 'file-text' }, { id: 'script-reels', label: 'AI Script Reels', icon: 'video' }, { id: 'ide-konten', label: 'AI Ide Konten', icon: 'lightbulb' } ]},
-  { group: 'Perencanaan', items: [ { id: 'calendar', label: 'Content Calendar', icon: 'calendar-days' }, { id: 'hashtag', label: 'AI Hashtag Generator', icon: 'hash' }, { id: 'content-score', label: 'AI Content Score', icon: 'gauge' }, { id: 'rewriter', label: 'AI Content Rewriter', icon: 'refresh-cw' }, { id: 'viral-analyzer', label: 'AI Viral Analyzer', icon: 'trending-up' } ]},
-  { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Generator', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Generator', icon: 'clapperboard' } ]},
-  { group: 'Manajemen', items: [ { id: 'library', label: 'Content Library', icon: 'folder' }, { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' }, { id: 'monetization', label: 'Monetization', icon: 'dollar-sign' }, { id: 'strategy', label: 'AI Content Strategy', icon: 'compass' }, { id: 'pricing', label: 'Paket & Harga', icon: 'credit-card' }, { id: 'profile', label: 'Profil', icon: 'user' } ]}
+  { group: 'Utama', items: [ { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' }, { id: 'content-generator', label: 'AI Chat Konten', icon: 'wand-2' }, { id: 'hook-generator', label: 'AI Chat Hook', icon: 'zap' }, { id: 'caption-generator', label: 'AI Chat Caption', icon: 'file-text' }, { id: 'script-reels', label: 'AI Chat Script Reels', icon: 'video' }, { id: 'ide-konten', label: 'AI Chat Ide Konten', icon: 'lightbulb' } ]},
+  { group: 'Perencanaan', items: [ { id: 'calendar', label: 'Content Calendar', icon: 'calendar-days' }, { id: 'hashtag', label: 'AI Chat Hashtag', icon: 'hash' }, { id: 'content-score', label: 'AI Chat Content Score', icon: 'gauge' }, { id: 'rewriter', label: 'AI Chat Rewriter', icon: 'refresh-cw' }, { id: 'viral-analyzer', label: 'AI Chat Viral Analyzer', icon: 'trending-up' } ]},
+  { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Chat Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Chat Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Chat Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Chat Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Generator', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Generator', icon: 'clapperboard' } ]},
+  { group: 'Manajemen', items: [ { id: 'library', label: 'Content Library', icon: 'folder' }, { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' }, { id: 'monetization', label: 'Monetization', icon: 'dollar-sign' }, { id: 'strategy', label: 'Chat Content Strategy', icon: 'compass' }, { id: 'pricing', label: 'Paket & Harga', icon: 'credit-card' }, { id: 'profile', label: 'Profil', icon: 'user' } ]}
 ];
 if (STATE.user?.role === 'admin') { NAV_ITEMS.push({ group: 'Admin', items: [ { id: 'admin', label: 'Admin Panel', icon: 'shield' } ]}); }
 
@@ -570,17 +578,17 @@ function navigateTo(view) {
   if (item) item.classList.add('active');
   closeSidebar();
   const titles = {
-    'dashboard': ['Dashboard', 'Ringkasan performa konten kamu'], 'content-generator': ['AI Content Generator', 'Hasilkan ide, hook, caption, CTA, dan hashtag dari satu topik'],
-    'hook-generator': ['AI Hook Generator', 'Buat 20+ hook berpotensi tinggi'], 'caption-generator': ['AI Caption Generator', 'Caption untuk berbagai gaya'],
-    'script-reels': ['AI Script Reels', 'Script lengkap 15-90 detik dengan timeline'], 'ide-konten': ['AI Ide Konten', '30 ide konten dari niche kamu'],
-    'calendar': ['Content Calendar', 'Atur dan jadwalkan konten bulanan'], 'hashtag': ['AI Hashtag Generator', 'Hashtag utama, niche, lokal, dan long-tail'],
-    'content-score': ['AI Content Score', 'Skor kualitas konten 0-100'], 'rewriter': ['AI Content Rewriter', 'Tulis ulang caption dengan gaya berbeda'],
-    'viral-analyzer': ['AI Viral Content Analyzer', 'Analisis potensi viral konten'], 'reels-assistant': ['Facebook Reels Assistant', 'Ide, script, dan shot list untuk Reels'],
-    'branding': ['Personal Branding Builder', 'Bangun personal brand yang konsisten'], 'pillar': ['Content Pillar Generator', '5-7 content pillar dari niche'],
-    'trend': ['Trend & Opportunity', 'Topik dan ide konten yang sedang ramai'], 'image-prompt': ['AI Image Generator', 'Hasilkan gambar langsung dari AI'],
+    'dashboard': ['Dashboard', 'Ringkasan performa konten kamu'], 'content-generator': ['AI Chat Konten', 'Buat ide, hook, caption, CTA, dan hashtag dari satu topik'],
+    'hook-generator': ['AI Chat Hook Generator', 'Buat 20+ hook berpotensi tinggi'], 'caption-generator': ['AI Chat Caption Generator', 'Caption untuk berbagai gaya'],
+    'script-reels': ['AI Chat Script Reels', 'Script lengkap 15-90 detik dengan timeline'], 'ide-konten': ['AI Chat Ide Konten', '30 ide konten dari niche kamu'],
+    'calendar': ['Content Calendar', 'Atur dan jadwalkan konten bulanan'], 'hashtag': ['AI Chat Hashtag Generator', 'Hashtag utama, niche, lokal, dan long-tail'],
+    'content-score': ['AI Chat Content Score', 'Skor kualitas konten 0-100'], 'rewriter': ['AI Chat Content Rewriter', 'Tulis ulang caption dengan gaya berbeda'],
+    'viral-analyzer': ['AI Chat Viral Content Analyzer', 'Analisis potensi viral konten'], 'reels-assistant': ['Chat Reels Assistant', 'Ide, script, dan shot list untuk Reels'],
+    'branding': ['Chat Personal Branding Builder', 'Bangun personal brand yang konsisten'], 'pillar': ['Chat Content Pillar Generator', '5-7 content pillar dari niche'],
+    'trend': ['Chat Trend & Opportunity', 'Topik dan ide konten yang sedang ramai'], 'image-prompt': ['AI Image Generator', 'Hasilkan gambar langsung dari AI'],
     'video-prompt': ['AI Video Generator', 'Hasilkan video pendek dari AI'], 'library': ['Content Library', 'Semua konten tersimpan kamu'],
     'analytics': ['Analytics', 'Performa konten dan rekomendasi AI'], 'monetization': ['Monetization Assistant', 'Strategi monetisasi konten'],
-    'strategy': ['AI Content Strategy', 'Strategi konten lengkap dari AI'], 'pricing': ['Paket & Harga', 'Pilih paket yang sesuai kebutuhan'],
+    'strategy': ['Chat AI Content Strategy', 'Strategi konten lengkap dari AI'], 'pricing': ['Paket & Harga', 'Pilih paket yang sesuai kebutuhan'],
     'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu'], 'admin': ['Admin Panel', 'Kelola pengguna dan sistem']
   };
   const t = titles[view] || ['FB PRO AI CREATOR', ''];
@@ -593,15 +601,15 @@ function renderView(view) {
   const main = document.getElementById('mainContent');
   main.innerHTML = '';
   const renderers = {
-    'dashboard': renderDashboard, 'content-generator': renderContentGenerator, 'hook-generator': renderHookGenerator,
-    'caption-generator': renderCaptionGenerator, 'script-reels': renderScriptReels, 'ide-konten': renderIdeKonten,
-    'calendar': renderCalendar, 'hashtag': renderHashtag, 'content-score': renderContentScore, 'rewriter': renderRewriter,
-    'viral-analyzer': renderViralAnalyzer, 'reels-assistant': renderReelsAssistant, 'branding': renderBranding,
-    'pillar': renderPillar, 'trend': renderTrend, 'image-prompt': renderImagePrompt, 'video-prompt': renderVideoPrompt,
-    'library': renderLibrary, 'analytics': renderAnalytics, 'monetization': renderMonetization, 'strategy': renderStrategy,
+    'dashboard': renderDashboard, 'content-generator': renderChatView, 'hook-generator': renderChatView,
+    'caption-generator': renderChatView, 'script-reels': renderChatView, 'ide-konten': renderChatView,
+    'calendar': renderCalendar, 'hashtag': renderChatView, 'content-score': renderChatView, 'rewriter': renderChatView,
+    'viral-analyzer': renderChatView, 'reels-assistant': renderChatView, 'branding': renderChatView,
+    'pillar': renderChatView, 'trend': renderChatView, 'image-prompt': renderImagePrompt, 'video-prompt': renderVideoPrompt,
+    'library': renderLibrary, 'analytics': renderAnalytics, 'monetization': renderMonetization, 'strategy': renderChatView,
     'pricing': renderPricingView, 'profile': renderProfile, 'admin': renderAdmin
   };
-  if (renderers[view]) renderers[view](main);
+  if (renderers[view]) renderers[view](main, view);
   lucide.createIcons();
 }
 
@@ -664,7 +672,6 @@ function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[v
 function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
 function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
 function canGenerate() { 
-  // SEMENTARA DIMATIKAN UNTUK TESTING
   return true; 
 }
 
@@ -709,152 +716,144 @@ async function callAI(prompt, system='Kamu adalah asisten content creator Facebo
     console.error("AI Fallback Error:", e);
   }
 
-  // 3. Jika semua gagal, kembalikan string kosong (UI akan menampilkan fallback dummy)
+  // 3. Jika semua gagal, kembalikan string kosong
   await new Promise(r => setTimeout(r, 500));
   return null;
 }
 
 // ============================================================
-// CONTENT GENERATOR
+// GAYA CHAT (CHATGPT STYLE IMPLEMENTATION)
 // ============================================================
-function renderContentGenerator(main) {
+function renderChatView(main, view) {
+  const chatConfig = {
+    'content-generator': { title: 'AI Chat Konten', placeholder: 'Mis. Cara hemat untuk anak kos...', btnText: 'Kirim', system: 'Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.' },
+    'hook-generator': { title: 'AI Chat Hook Generator', placeholder: 'Masukkan topik hook...', btnText: 'Kirim', system: 'Kamu adalah asisten pembuat hook Facebook yang ahli. Buat hook yang berpotensi viral.' },
+    'caption-generator': { title: 'AI Chat Caption', placeholder: 'Masukkan topik caption...', btnText: 'Kirim', system: 'Kamu adalah asisten caption Facebook yang ahli.' },
+    'script-reels': { title: 'AI Chat Script Reels', placeholder: 'Masukkan topik script Reels...', btnText: 'Kirim', system: 'Kamu adalah asisten script Reels Facebook yang ahli. Sertakan visual dan voice over.' },
+    'ide-konten': { title: 'AI Chat Ide Konten', placeholder: 'Masukkan niche konten...', btnText: 'Kirim', system: 'Kamu adalah asisten ide konten Facebook yang ahli.' },
+    'hashtag': { title: 'AI Chat Hashtag', placeholder: 'Masukkan topik hashtag...', btnText: 'Kirim', system: 'Kamu adalah asisten hashtag Facebook yang ahli.' },
+    'content-score': { title: 'AI Chat Content Score', placeholder: 'Tempel teks konten untuk dinilai...', btnText: 'Analisis', system: 'Kamu adalah auditor konten Facebook yang ahli. Beri skor 0-100 dan masukan.' },
+    'rewriter': { title: 'AI Chat Rewriter', placeholder: 'Tempel teks yang ingin diubah...', btnText: 'Rewrite', system: 'Kamu adalah asisten rewrite konten Facebook yang ahli.' },
+    'viral-analyzer': { title: 'AI Chat Viral Analyzer', placeholder: 'Tempel teks konten untuk dianalisis...', btnText: 'Analisis', system: 'Kamu adalah analis viral Facebook yang ahli.' },
+    'reels-assistant': { title: 'Chat Reels Assistant', placeholder: 'Masukkan ide Reels...', btnText: 'Kirim', system: 'Kamu adalah asisten Reels Facebook yang ahli.' },
+    'branding': { title: 'Chat Personal Branding', placeholder: 'Masukkan nama/niche Anda...', btnText: 'Kirim', system: 'Kamu adalah ahli personal branding Facebook.' },
+    'pillar': { title: 'Chat Content Pillar', placeholder: 'Masukkan niche Anda...', btnText: 'Kirim', system: 'Kamu adalah ahli content pillar Facebook.' },
+    'trend': { title: 'Chat Trend & Opportunity', placeholder: 'Tanyakan trend apa saja...', btnText: 'Kirim', system: 'Kamu adalah analis tren Facebook Indonesia.' },
+    'strategy': { title: 'Chat AI Content Strategy', placeholder: 'Masukkan niche Anda...', btnText: 'Kirim', system: 'Kamu adalah ahli strategi konten Facebook.' }
+  };
+  
+  const cfg = chatConfig[view] || chatConfig['content-generator'];
+  
   main.innerHTML = `
-    ${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="grid lg:grid-cols-2 gap-5">
-      <div class="card p-5">
-        <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="wand-2" class="w-4 h-4 text-[var(--primary)]"></i> Konfigurasi Konten</h3>
-        <div class="space-y-3">
-          <div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="cg-topic" class="input" placeholder="Contoh: Cara hemat untuk anak kos"></div>
-          <button onclick="generateContent()" id="cg-btn" class="btn btn-primary w-full"><i data-lucide="wand-2" class="w-4 h-4"></i> Generate Konten</button>
-        </div>
+    <div class="card chat-container overflow-hidden">
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-bubble ai">Halo! Saya asisten AI kamu untuk <strong>${cfg.title}</strong>. Silakan tanyakan apa saja, saya akan membantu membuat konten terbaik untuk Facebook kamu.</div>
       </div>
-      <div class="card p-5">
-        <div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[var(--accent)]"></i> Hasil AI</h3></div>
-        <div id="cg-result" class="space-y-3"><div class="text-center py-12 text-[var(--text-3)]"><i data-lucide="sparkles" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Isi form di kiri, lalu klik Generate</p></div></div>
+      <div class="chat-input-area">
+        <textarea id="chatInput" placeholder="${cfg.placeholder}" rows="1"></textarea>
+        <button onclick="sendChatMessage('${view}')" class="btn btn-primary" style="height: 44px; width: 44px; padding: 0; border-radius: 12px;">
+          <i data-lucide="send" class="w-5 h-5"></i>
+        </button>
       </div>
-    </div>`;
-}
-async function generateContent() {
-  if (!canGenerate()) return;
-  const topic = document.getElementById('cg-topic').value.trim();
-  if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const btn = document.getElementById('cg-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('cg-result'); result.innerHTML = `<div class="space-y-3">${skeletonLoader(6)}</div>`;
+    </div>
+  `;
   
-  const aiResult = await callAI(`Buat 5 ide konten Facebook tentang "${topic}". Setiap ide harus berisi Hook dan Judul. Formatkan dalam bentuk list yang jelas.`);
-  trackUsage();
+  // Auto resize textarea
+  const textarea = document.getElementById('chatInput');
+  textarea.addEventListener('input', () => {
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+  });
   
-  let html = '';
-  if (aiResult) {
-    const lines = aiResult.split('\n').filter(l => l.trim() !== '');
-    lines.slice(0, 5).forEach((line, i) => {
-      const safeText = line.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      html += `<div class="gen-content">
-        <div class="flex items-start justify-between mb-2"><span class="badge badge-primary">${i+1}</span>
-          <div class="flex gap-1">
-            <button onclick='copyText("${safeText}")' class="btn btn-ghost btn-sm" data-tooltip="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-            <button onclick='saveContentItem({type:"ide",title:"Ide Konten ${i+1}",content:"${safeText}",icon:"lightbulb"})' class="btn btn-ghost btn-sm" data-tooltip="Save"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button>
-          </div>
-        </div>
-        <div class="space-y-2 text-sm">
-          <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Konten</div><div class="font-medium whitespace-pre-line">${line}</div></div>
-        </div>
-      </div>`;
-    });
-  } else {
-    for (let i = 0; i < 5; i++) {
-      const title = `Ide konten tentang ${topic} - Bagian ${i+1}`;
-      const hook = `${topic} itu nggak sesulit yang kamu bayangkan`;
-      const safeTitle = title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      const safeHook = hook.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      html += `<div class="gen-content">
-        <div class="flex items-start justify-between mb-2"><span class="badge badge-primary">${i+1}</span>
-          <div class="flex gap-1">
-            <button onclick='copyText("${safeHook}")' class="btn btn-ghost btn-sm" data-tooltip="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
-            <button onclick='saveContentItem({type:"ide",title:"${safeTitle}",content:"${safeHook}",icon:"lightbulb"})' class="btn btn-ghost btn-sm" data-tooltip="Save"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button>
-          </div>
-        </div>
-        <div class="space-y-2 text-sm">
-          <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Hook</div><div class="font-medium">${hook}</div></div>
-          <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Judul</div><div class="font-semibold">${title}</div></div>
-        </div>
-      </div>`;
+  // Enter to send
+  textarea.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatMessage(view);
     }
-  }
+  });
   
-  result.innerHTML = html || '<div class="text-center py-12 text-[var(--text-3)]">Tidak ada hasil.</div>';
   lucide.createIcons();
-  btn.disabled = false; btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Konten';
 }
 
-// ============================================================
-// HOOKS & OTHER GENERATORS
-// ============================================================
-function renderHookGenerator(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-[var(--accent)]"></i> AI Hook Generator</h3><input id="hg-topic" class="input mb-3" placeholder="Topik"><button onclick="generateHooks()" id="hg-btn" class="btn btn-primary"><i data-lucide="zap" class="w-4 h-4"></i> Generate</button></div><div id="hg-result"></div>`; }
-async function generateHooks() {
-  if (!canGenerate()) return; 
-  const topic = document.getElementById('hg-topic').value.trim(); 
-  if (!topic) { toast('Isi topik', 'warning'); return; }
-  const btn = document.getElementById('hg-btn'); btn.disabled = true; btn.innerHTML = 'Generating...'; 
-  const result = document.getElementById('hg-result'); result.innerHTML = skeletonLoader(3);
+async function sendChatMessage(view) {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
   
-  const aiResult = await callAI(`Buat 3 hook Facebook yang berpotensi viral tentang "${topic}". Format list.`); 
+  const messages = document.getElementById('chatMessages');
+  
+  // Add user message
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble user';
+  userBubble.textContent = msg;
+  messages.appendChild(userBubble);
+  
+  // Clear input
+  input.value = '';
+  input.style.height = 'auto';
+  
+  // Add loading bubble
+  const loadingBubble = document.createElement('div');
+  loadingBubble.className = 'chat-bubble ai';
+  loadingBubble.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div>';
+  messages.appendChild(loadingBubble);
+  
+  // Scroll to bottom
+  messages.scrollTop = messages.scrollHeight;
+  
+  // Call AI
+  const chatConfig = {
+    'content-generator': `Buat 5 ide konten Facebook tentang "${msg}". Setiap ide harus berisi Hook dan Judul.`,
+    'hook-generator': `Buat 3 hook Facebook yang berpotensi viral tentang "${msg}".`,
+    'caption-generator': `Buat caption Facebook yang menarik tentang: ${msg}`,
+    'script-reels': `Buat script Reels 30 detik tentang ${msg}. Sertakan visual dan voice over.`,
+    'ide-konten': `Buat 5 ide konten Facebook tentang niche ${msg}.`,
+    'hashtag': `Buat 10 hashtag Facebook yang relevan dengan ${msg}`,
+    'content-score': `Analisis konten ini dan beri skor dari 0-100 beserta alasannya: ${msg}`,
+    'rewriter': `Tulis ulang teks ini agar lebih menarik dan interaktif: ${msg}`,
+    'viral-analyzer': `Analisis potensi viral konten ini: ${msg}. Sebutkan kelebihan dan kekurangannya.`,
+    'reels-assistant': `Buat ide, script, dan shot list untuk Reels tentang ${msg}`,
+    'branding': `Buat strategi personal branding untuk ${msg} di Facebook.`,
+    'pillar': `Buat 5 content pillar untuk niche ${msg}`,
+    'trend': `Sebutkan trend terkait: ${msg}`,
+    'strategy': `Buat strategi konten Facebook 1 bulan untuk niche ${msg}.`
+  };
+  
+  const prompt = chatConfig[view] || msg;
+  const aiResult = await callAI(prompt);
   trackUsage();
   
-  let hooks = [];
+  // Remove loading bubble
+  loadingBubble.remove();
+  
+  // Add AI response
+  const aiBubble = document.createElement('div');
+  aiBubble.className = 'chat-bubble ai';
+  
   if (aiResult) {
-    hooks = aiResult.split('\n').filter(l => l.trim() !== '').slice(0, 3);
+    aiBubble.innerHTML = aiResult.replace(/\n/g, '<br>');
   } else {
-    hooks = [`Rahasia ${topic}`, `Sering gagal ${topic}?`, `3 hal soal ${topic}`];
+    aiBubble.textContent = 'Maaf, saya tidak bisa merespons saat ini. Coba lagi nanti.';
   }
-
-  result.innerHTML = hooks.map((h, i) => {
-    const safeH = h.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    return `<div class="gen-content flex items-start gap-3 mb-2"><span class="badge badge-primary">${i+1}</span><div class="flex-1"><div class="text-sm mb-2">${h}</div><button onclick='saveContentItem({type:"hook",title:"Hook",content:"${safeH}",icon:"zap"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3 h-3"></i> Save</button></div></div>`;
-  }).join('');
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> Generate';
-}
-
-function renderCaptionGenerator(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Caption</h3><input id="cap-topic" class="input mb-3" placeholder="Topik"><button onclick="generateCaption()" id="cap-btn" class="btn btn-primary">Generate</button></div><div id="cap-result" class="mt-4"></div>`; }
-async function generateCaption() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('cap-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('cap-btn').disabled = true; 
-  const aiResult = await callAI(`Buat caption Facebook yang menarik tentang: ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `${t} itu mudah jika tahu caranya.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('cap-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"caption",title:"Caption",content:"${safeText}",icon:"file-text"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('cap-btn').disabled=false; 
-}
-
-function renderScriptReels(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Script Reels</h3><input id="sr-topic" class="input mb-3" placeholder="Topik"><button onclick="generateScriptReels()" id="sr-btn" class="btn btn-primary">Generate</button></div><div id="sr-result" class="mt-4"></div>`; }
-async function generateScriptReels() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('sr-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('sr-btn').disabled = true; 
-  const aiResult = await callAI(`Buat script Reels 30 detik tentang ${t}. Sertakan visual dan voice over.`); 
-  trackUsage(); 
-  const text = aiResult || `Hook: ${t}!\n\nVisual: Orang sedang belajar.\nVoice Over: ${t} bisa kamu kuasai dengan cepat.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('sr-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"script",title:"Script Reels",content:"${safeText}",icon:"video"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('sr-btn').disabled=false; 
-}
-
-function renderIdeKonten(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Ide Konten</h3><input id="ik-niche" class="input mb-3" placeholder="Niche"><button onclick="generateIdeKonten()" id="ik-btn" class="btn btn-primary">Generate</button></div><div id="ik-result" class="mt-4"></div>`; }
-async function generateIdeKonten() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('ik-niche').value.trim(); 
-  if(!t){toast('Isi niche','warning');return;} 
-  document.getElementById('ik-btn').disabled = true; 
-  const aiResult = await callAI(`Buat 5 ide konten Facebook tentang niche ${t}.`); 
-  trackUsage(); 
-  const text = aiResult || `Ide 1: Tips ${t} untuk pemula\nIde 2: Mistake ${t}\nIde 3: Review ${t}`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('ik-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"ide",title:"Ide",content:"${safeText}",icon:"lightbulb"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('ik-btn').disabled=false; 
+  
+  messages.appendChild(aiBubble);
+  
+  // Add save button
+  const saveBtn = document.createElement('button');
+  saveBtn.className = 'btn btn-ghost btn-sm mt-2';
+  saveBtn.style.alignSelf = 'flex-start';
+  saveBtn.innerHTML = '<i data-lucide="bookmark" class="w-3 h-3"></i> Simpan ke Library';
+  saveBtn.onclick = () => {
+    const safeText = (aiResult || 'Konten dari Chat AI').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
+    saveContentItem({type:"ide",title:"Chat AI: " + msg.slice(0, 30),content:safeText,icon:"lightbulb"});
+  };
+  messages.appendChild(saveBtn);
+  
+  // Scroll to bottom
+  messages.scrollTop = messages.scrollHeight;
+  
+  lucide.createIcons();
 }
 
 // ============================================================
@@ -961,114 +960,6 @@ function exportCalendarCSV() {
 }
 
 // ============================================================
-// OTHER TOOLS 
-// ============================================================
-function renderHashtag(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Hashtag</h3><input id="hsh-topic" class="input mb-3" placeholder="Topik"><button onclick="generateHashtag()" id="hsh-btn" class="btn btn-primary">Generate</button></div><div id="hsh-result" class="mt-4"></div>`; }
-async function generateHashtag() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('hsh-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('hsh-btn').disabled = true; 
-  const aiResult = await callAI(`Buat 10 hashtag Facebook yang relevan dengan ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `#${t.replace(/\s/g,'')} #viral #fyp #trending #indonesia #tips #viral2024`;
-  document.getElementById('hsh-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">${text}</div></div>`; 
-  lucide.createIcons(); document.getElementById('hsh-btn').disabled=false; 
-}
-
-function renderContentScore(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Content Score</h3><textarea id="cs-input" class="textarea mb-3" placeholder="Teks konten"></textarea><button onclick="analyzeScore()" id="cs-btn" class="btn btn-primary">Analisis</button></div><div id="cs-result" class="mt-4"></div>`; }
-async function analyzeScore() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('cs-input').value.trim(); 
-  if(!t){toast('Isi teks','warning');return;} 
-  document.getElementById('cs-btn').disabled = true; 
-  const aiResult = await callAI(`Analisis konten ini dan beri skor dari 0-100 beserta alasannya: ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `Skor: 85/100. Konten sudah cukup baik dan engaging.`;
-  document.getElementById('cs-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div></div>`; 
-  lucide.createIcons(); document.getElementById('cs-btn').disabled=false; 
-}
-
-function renderRewriter(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Rewriter</h3><textarea id="rw-input" class="textarea mb-3" placeholder="Teks asli"></textarea><button onclick="rewriteContent()" id="rw-btn" class="btn btn-primary">Rewrite</button></div><div id="rw-result" class="mt-4"></div>`; }
-async function rewriteContent() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('rw-input').value.trim(); 
-  if(!t){toast('Isi teks','warning');return;} 
-  document.getElementById('rw-btn').disabled = true; 
-  const aiResult = await callAI(`Tulis ulang teks ini agar lebih menarik dan interaktif: ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `${t} (versi lebih menarik dan interaktif)`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('rw-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"caption",title:"Rewritten",content:"${safeText}",icon:"file-text"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('rw-btn').disabled=false; 
-}
-
-function renderViralAnalyzer(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Viral Analyzer</h3><textarea id="va-input" class="textarea mb-3" placeholder="Teks"></textarea><button onclick="analyzeViral()" id="va-btn" class="btn btn-primary">Analisis</button></div><div id="va-result" class="mt-4"></div>`; }
-async function analyzeViral() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('va-input').value.trim(); 
-  if(!t){toast('Isi teks','warning');return;} 
-  document.getElementById('va-btn').disabled = true; 
-  const aiResult = await callAI(`Analisis potensi viral konten ini: ${t}. Sebutkan kelebihan dan kekurangannya.`); 
-  trackUsage(); 
-  const text = aiResult || `Potensi viral tinggi! Hook kuat dan topik sedang tren.`;
-  document.getElementById('va-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div></div>`; 
-  lucide.createIcons(); document.getElementById('va-btn').disabled=false; 
-}
-
-function renderReelsAssistant(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Reels Assistant</h3><input id="ra-topic" class="input mb-3" placeholder="Topik"><button onclick="generateReelsAssistant()" id="ra-btn" class="btn btn-primary">Generate</button></div><div id="ra-result" class="mt-4"></div>`; }
-async function generateReelsAssistant() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('ra-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('ra-btn').disabled = true; 
-  const aiResult = await callAI(`Buat ide, script, dan shot list untuk Reels tentang ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `Ide Reels: ${t}. Shot 1: Intro. Shot 2: Detail.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('ra-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"script",title:"Reels Assistant",content:"${safeText}",icon:"film"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('ra-btn').disabled=false; 
-}
-
-function renderBranding(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Personal Branding</h3><input id="pb-name" class="input mb-3" placeholder="Nama"><button onclick="generateBranding()" id="pb-btn" class="btn btn-primary">Generate</button></div><div id="pb-result" class="mt-4"></div>`; }
-async function generateBranding() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('pb-name').value.trim(); 
-  if(!t){toast('Isi nama','warning');return;} 
-  document.getElementById('pb-btn').disabled = true; 
-  const aiResult = await callAI(`Buat strategi personal branding untuk ${t} di Facebook. Sertakan bio, nilai, dan niche.`); 
-  trackUsage(); 
-  const text = aiResult || `Bio: ${t} | Content Creator profesional yang fokus pada edukasi.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('pb-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"branding",title:"Branding",content:"${safeText}",icon:"user-cog"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('pb-btn').disabled=false; 
-}
-
-function renderPillar(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Content Pillar</h3><input id="pl-niche" class="input mb-3" placeholder="Niche"><button onclick="generatePillar()" id="pl-btn" class="btn btn-primary">Generate</button></div><div id="pl-result" class="mt-4"></div>`; }
-async function generatePillar() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('pl-niche').value.trim(); 
-  if(!t){toast('Isi niche','warning');return;} 
-  document.getElementById('pl-btn').disabled = true; 
-  const aiResult = await callAI(`Buat 5 content pillar untuk niche ${t}`); 
-  trackUsage(); 
-  const text = aiResult || `Pilar 1: Edukasi ${t}. Pilar 2: Inspirasi. Pilar 3: Behind the scenes.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('pl-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"ide",title:"Content Pillar",content:"${safeText}",icon:"columns-3"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('pl-btn').disabled=false; 
-}
-
-function renderTrend(main) { main.innerHTML = `<div class="card p-5"><h3 class="font-bold mb-4">Trend & Opportunity</h3><button onclick="generateTrend()" class="btn btn-primary">Generate</button></div><div id="tr-result" class="mt-4"></div>`; }
-async function generateTrend() { 
-  if (!canGenerate()) return; 
-  const aiResult = await callAI(`Sebutkan 3 topik Facebook yang sedang tren di Indonesia saat ini beserta alasannya.`); 
-  trackUsage(); 
-  const text = aiResult || `Trend: 1. AI Tools. 2. Gaya Hidup Hemat. 3. Bisnis Online.`;
-  document.getElementById('tr-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div></div>`; 
-  lucide.createIcons(); 
-}
-
-// ============================================================
 // AI GAMBAR (REAL IMAGE GENERATION)
 // ============================================================
 function renderImagePrompt(main) { 
@@ -1091,11 +982,9 @@ async function generateImagePrompt() {
   trackUsage(); 
 
   try {
-    // Menggunakan Pollinations.ai untuk menghasilkan gambar langsung
     const seed = Math.floor(Math.random() * 100000);
     const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(t)}?width=768&height=768&nologo=true&seed=${seed}`;
     
-    // Preload image
     const img = new Image();
     img.src = imageUrl;
     img.onload = () => {
@@ -1231,18 +1120,6 @@ function openContentItem(id) { const item = STATE.contentLibrary.find(c=>c.id===
 // ============================================================
 function renderAnalytics(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-3">Analytics</h3><p class="text-sm text-[var(--text-2)]">Views 125K, Likes 8.2K</p></div>`; lucide.createIcons(); }
 function renderMonetization(main) { main.innerHTML = `<div class="card p-5"><h3 class="font-bold mb-3">Monetization</h3><p class="text-sm text-[var(--text-2)]">Strategi monetisasi konten.</p></div>`; lucide.createIcons(); }
-function renderStrategy(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Content Strategy</h3><input id="st-niche" class="input mb-3" placeholder="Niche"><button onclick="generateStrategy()" id="st-btn" class="btn btn-primary">Generate</button></div><div id="st-result" class="mt-4"></div>`; }
-async function generateStrategy() { 
-  if (!canGenerate()) return; 
-  const t = document.getElementById('st-niche').value.trim(); 
-  if(!t){toast('Isi niche','warning');return;} 
-  document.getElementById('st-btn').disabled = true; 
-  const aiResult = await callAI(`Buat strategi konten Facebook 1 bulan untuk niche ${t}. Sertakan pilar konten dan jadwal posting.`); 
-  trackUsage(); 
-  const text = aiResult ? `<div class="whitespace-pre-line">${aiResult}</div>` : `<div class="card p-5">Pilar 1: Edukasi ${t}. Jadwal: Senin, Rabu, Jumat.</div>`;
-  document.getElementById('st-result').innerHTML = `<div class="card p-5 text-sm">${text}</div>`; 
-  lucide.createIcons(); document.getElementById('st-btn').disabled=false; 
-}
 function renderPricingView(main) { main.innerHTML = `<div class="card p-5 mb-4"><div class="text-xs text-[var(--text-3)] mb-1">Paket saat ini</div><div class="text-2xl font-extrabold gradient-text">${STATE.subscriptions.plan || 'FREE'}</div></div><div class="grid md:grid-cols-3 gap-5">${['FREE','PRO','PREMIUM'].map(p => `<div class="card p-6 ${STATE.subscriptions.plan === p ? 'border-2 border-[var(--primary)]' : ''}"><div class="text-xs font-semibold uppercase mb-1">${p}</div><button onclick="upgradePlan('${p}')" class="btn ${STATE.subscriptions.plan === p ? 'btn-secondary' : 'btn-primary'} w-full">${STATE.subscriptions.plan === p ? 'Aktif' : 'Upgrade'}</button></div>`).join('')}</div>`; lucide.createIcons(); }
 async function upgradePlan(plan) { 
   STATE.subscriptions.plan = plan; 
@@ -1293,7 +1170,7 @@ function emptyState(title, desc, icon='package', btnText=null, btnAction=null) {
 const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Bisa! Isi API Key OpenAI pada bagian ENV di dalam kode untuk menyalakan AI secara penuh.'], ['Apakah data saya aman?', 'Ya. Password di-hash, data terisolasi per user_id.']];
 document.getElementById('faqList').innerHTML = faqs.map(([q, a]) => `<div class="card p-4"><details><summary class="font-semibold cursor-pointer flex items-center justify-between text-sm">${q} <i data-lucide="chevron-down" class="w-4 h-4"></i></summary><p class="text-sm text-[var(--text-2)] mt-3">${a}</p></details></div>`).join('');
 
-const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Generator','image','primary'],['video-prompt','AI Video Generator','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
+const allTools = [['content-generator','AI Chat Konten','wand-2','primary'],['hook-generator','AI Chat Hook','zap','accent'],['caption-generator','AI Chat Caption','file-text','primary'],['script-reels','AI Chat Script Reels','video','accent'],['ide-konten','AI Chat Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Chat Hashtag','hash','accent'],['content-score','AI Chat Content Score','gauge','success'],['rewriter','AI Chat Rewriter','refresh-cw','primary'],['viral-analyzer','AI Chat Viral Analyzer','trending-up','accent'],['reels-assistant','Chat Reels Assistant','film','primary'],['branding','Chat Personal Branding','user-cog','accent'],['pillar','Chat Content Pillar','columns-3','warning'],['trend','Chat Trend & Opportunity','flame','danger'],['image-prompt','AI Image Generator','image','primary'],['video-prompt','AI Video Generator','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','Chat AI Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
 document.getElementById('toolsGrid').innerHTML = allTools.map(([id, label, icon, color]) => `<button onclick="showAuth('register')" class="card p-4 text-left hover:scale-[1.02] transition-transform"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-5 h-5"></i></div><div class="font-semibold text-sm">${label}</div></button>`).join('');
 
 // ============================================================
