@@ -278,7 +278,7 @@ const STATE = {
 };
 
 const CONFIG = {
-  DEMO_MODE: !(window.ENV?.AI_API_URL)
+  DEMO_MODE: false // Paksa AI selalu aktif
 };
 
 const LocalDB = {
@@ -630,16 +630,30 @@ function canGenerate() {
   return true; 
 }
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
-  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL && sb) {
+  if (!CONFIG.DEMO_MODE && sb) {
     try {
-      // Gunakan fungsi resmi Supabase
-      const { data, error } = await sb.functions.invoke('generate-ai', {
-        body: { prompt, system }
+      // URL Supabase kamu sudah dimasukkan langsung di sini
+      const res = await fetch('https://vsofvyruthaadkjylybp.supabase.co/functions/v1/generate-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sb.supabaseKey}`
+        },
+        body: JSON.stringify({ prompt, system })
       });
 
-      if (error) throw error;
-      if (data.error) throw new Error(data.error.message || data.error);
+      const responseText = await res.text();
       
+      if (!res.ok) {
+        try {
+          const errData = JSON.parse(responseText);
+          throw new Error(errData.error?.message || errData.message || responseText);
+        } catch (e) {
+          throw new Error(responseText);
+        }
+      }
+
+      const data = JSON.parse(responseText);
       return data.choices[0].message.content;
     } catch (e) { 
       console.error("AI Fetch Error:", e);
@@ -650,7 +664,6 @@ async function callAI(prompt, system='Kamu adalah asisten content creator Facebo
   await new Promise(r => setTimeout(r, 800));
   return null;
 }
-
 // ============================================================
 // CONTENT GENERATOR
 // ============================================================
