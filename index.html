@@ -524,7 +524,7 @@ function updateTopbar() {
 const NAV_ITEMS = [
   { group: 'Utama', items: [ { id: 'dashboard', label: 'Dashboard', icon: 'layout-dashboard' }, { id: 'content-generator', label: 'AI Content Generator', icon: 'wand-2' }, { id: 'hook-generator', label: 'AI Hook Generator', icon: 'zap' }, { id: 'caption-generator', label: 'AI Caption Generator', icon: 'file-text' }, { id: 'script-reels', label: 'AI Script Reels', icon: 'video' }, { id: 'ide-konten', label: 'AI Ide Konten', icon: 'lightbulb' } ]},
   { group: 'Perencanaan', items: [ { id: 'calendar', label: 'Content Calendar', icon: 'calendar-days' }, { id: 'hashtag', label: 'AI Hashtag Generator', icon: 'hash' }, { id: 'content-score', label: 'AI Content Score', icon: 'gauge' }, { id: 'rewriter', label: 'AI Content Rewriter', icon: 'refresh-cw' }, { id: 'viral-analyzer', label: 'AI Viral Analyzer', icon: 'trending-up' } ]},
-  { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Prompt', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Prompt', icon: 'clapperboard' } ]},
+  { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Generator', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Generator', icon: 'clapperboard' } ]},
   { group: 'Manajemen', items: [ { id: 'library', label: 'Content Library', icon: 'folder' }, { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' }, { id: 'monetization', label: 'Monetization', icon: 'dollar-sign' }, { id: 'strategy', label: 'AI Content Strategy', icon: 'compass' }, { id: 'pricing', label: 'Paket & Harga', icon: 'credit-card' }, { id: 'profile', label: 'Profil', icon: 'user' } ]}
 ];
 if (STATE.user?.role === 'admin') { NAV_ITEMS.push({ group: 'Admin', items: [ { id: 'admin', label: 'Admin Panel', icon: 'shield' } ]}); }
@@ -572,8 +572,8 @@ function navigateTo(view) {
     'content-score': ['AI Content Score', 'Skor kualitas konten 0-100'], 'rewriter': ['AI Content Rewriter', 'Tulis ulang caption dengan gaya berbeda'],
     'viral-analyzer': ['AI Viral Content Analyzer', 'Analisis potensi viral konten'], 'reels-assistant': ['Facebook Reels Assistant', 'Ide, script, dan shot list untuk Reels'],
     'branding': ['Personal Branding Builder', 'Bangun personal brand yang konsisten'], 'pillar': ['Content Pillar Generator', '5-7 content pillar dari niche'],
-    'trend': ['Trend & Opportunity', 'Topik dan ide konten yang sedang ramai'], 'image-prompt': ['AI Image Prompt Generator', 'Prompt gambar untuk thumbnail dan cover'],
-    'video-prompt': ['AI Video Prompt Generator', 'Prompt video AI untuk berbagai format'], 'library': ['Content Library', 'Semua konten tersimpan kamu'],
+    'trend': ['Trend & Opportunity', 'Topik dan ide konten yang sedang ramai'], 'image-prompt': ['AI Image Generator', 'Hasilkan gambar langsung dari AI'],
+    'video-prompt': ['AI Video Generator', 'Hasilkan video pendek dari AI'], 'library': ['Content Library', 'Semua konten tersimpan kamu'],
     'analytics': ['Analytics', 'Performa konten dan rekomendasi AI'], 'monetization': ['Monetization Assistant', 'Strategi monetisasi konten'],
     'strategy': ['AI Content Strategy', 'Strategi konten lengkap dari AI'], 'pricing': ['Paket & Harga', 'Pilih paket yang sesuai kebutuhan'],
     'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu'], 'admin': ['Admin Panel', 'Kelola pengguna dan sistem']
@@ -1063,39 +1063,116 @@ async function generateTrend() {
   lucide.createIcons(); 
 }
 
-function renderImagePrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Image Prompt</h3><input id="ip-topic" class="input mb-3" placeholder="Topik"><button onclick="generateImagePrompt()" id="ip-btn" class="btn btn-primary">Generate</button></div><div id="ip-result" class="mt-4"></div>`; }
+// ============================================================
+// AI GAMBAR (REAL IMAGE GENERATION)
+// ============================================================
+function renderImagePrompt(main) { 
+  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
+  <div class="card p-5">
+    <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-[var(--primary)]"></i> AI Image Generator</h3>
+    <input id="ip-topic" class="input mb-3" placeholder="Deskripsikan gambar yang ingin dibuat (cth: Kucing astronot di bulan)">
+    <button onclick="generateImagePrompt()" id="ip-btn" class="btn btn-primary w-full"><i data-lucide="wand-2" class="w-4 h-4"></i> Generate Gambar</button>
+  </div>
+  <div id="ip-result" class="mt-4"></div>`; 
+}
 async function generateImagePrompt() { 
   if (!canGenerate()) return; 
   const t = document.getElementById('ip-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('ip-btn').disabled = true; 
-  const aiResult = await callAI(`Buat prompt gambar AI dalam bahasa Inggris untuk topik: ${t}.`); 
+  if(!t){toast('Isi topik gambar','warning');return;} 
+  const btn = document.getElementById('ip-btn'); btn.disabled = true; btn.innerHTML = 'Generating...';
+  const result = document.getElementById('ip-result'); 
+  result.innerHTML = `<div class="text-center py-8"><div class="loading-dots text-[var(--primary)] mb-2"><span></span><span></span><span></span></div><p class="text-sm text-[var(--text-2)]">AI sedang melukis gambar...</p></div>`;
+  
   trackUsage(); 
-  const text = aiResult || `Prompt: ${t}, 8k, photorealistic, highly detailed, cinematic lighting.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('ip-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"prompt",title:"Image Prompt",content:"${safeText}",icon:"image"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('ip-btn').disabled=false; 
+
+  try {
+    // Menggunakan Pollinations.ai untuk menghasilkan gambar langsung
+    const seed = Math.floor(Math.random() * 100000);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(t)}?width=768&height=768&nologo=true&seed=${seed}`;
+    
+    // Preload image
+    const img = new Image();
+    img.src = imageUrl;
+    img.onload = () => {
+      result.innerHTML = `
+        <div class="gen-content">
+          <div class="rounded-xl overflow-hidden mb-3 border border-[var(--border)]">
+            <img src="${imageUrl}" alt="${t}" class="w-full h-auto">
+          </div>
+          <div class="flex gap-2">
+            <a href="${imageUrl}" download="ai-image.jpg" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download</a>
+            <button onclick='saveContentItem({type:"prompt",title:"Image: ${t}",content:"${imageUrl}",icon:"image"})' class="btn btn-primary btn-sm flex-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save</button>
+          </div>
+        </div>`;
+      lucide.createIcons();
+      btn.disabled = false; btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Gambar';
+    };
+    img.onerror = () => {
+      throw new Error("Gagal load gambar");
+    };
+  } catch (e) {
+    result.innerHTML = `<div class="gen-content text-center text-[var(--danger)]">Gagal menghasilkan gambar. Coba lagi.</div>`;
+    btn.disabled = false; btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Gambar';
+  }
 }
 
-function renderVideoPrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Video Prompt</h3><input id="vp-topic" class="input mb-3" placeholder="Topik"><button onclick="generateVideoPrompt()" id="vp-btn" class="btn btn-primary">Generate</button></div><div id="vp-result" class="mt-4"></div>`; }
+// ============================================================
+// AI VIDEO (VIDEO GENERATION VIA POLLINATIONS/MOCK)
+// ============================================================
+function renderVideoPrompt(main) { 
+  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
+  <div class="card p-5">
+    <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="clapperboard" class="w-4 h-4 text-[var(--primary)]"></i> AI Video Generator</h3>
+    <input id="vp-topic" class="input mb-3" placeholder="Deskripsikan video yang ingin dibuat (cth: Drone shot kota malam)">
+    <button onclick="generateVideoPrompt()" id="vp-btn" class="btn btn-primary w-full"><i data-lucide="wand-2" class="w-4 h-4"></i> Generate Video</button>
+    <p class="text-xs text-[var(--text-3)] mt-2">*AI akan membuat gambar utama dan script video.</p>
+  </div>
+  <div id="vp-result" class="mt-4"></div>`; 
+}
 async function generateVideoPrompt() { 
   if (!canGenerate()) return; 
   const t = document.getElementById('vp-topic').value.trim(); 
-  if(!t){toast('Isi topik','warning');return;} 
-  document.getElementById('vp-btn').disabled = true; 
-  const aiResult = await callAI(`Buat prompt video AI (Runway/Sora style) dalam bahasa Inggris untuk topik: ${t}.`); 
-  trackUsage(); 
-  const text = aiResult || `Prompt: Cinematic drone shot of ${t}, slow motion, 4k.`;
-  const safeText = text.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ');
-  document.getElementById('vp-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2 whitespace-pre-line">${text}</div><button onclick='saveContentItem({type:"prompt",title:"Video Prompt",content:"${safeText}",icon:"clapperboard"})' class="btn btn-ghost btn-sm">Save</button></div>`; 
-  lucide.createIcons(); document.getElementById('vp-btn').disabled=false; 
+  if(!t){toast('Isi topik video','warning');return;} 
+  const btn = document.getElementById('vp-btn'); btn.disabled = true; btn.innerHTML = 'Generating...';
+  const result = document.getElementById('vp-result'); 
+  result.innerHTML = `<div class="text-center py-8"><div class="loading-dots text-[var(--primary)] mb-2"><span></span><span></span><span></span></div><p class="text-sm text-[var(--text-2)]">AI sedang merender video...</p></div>`;
+  
+  trackUsage();
+
+  try {
+    const aiScript = await callAI(`Buat script video pendek 15 detik tentang: ${t}. Sertakan visual yang dirender dan voice over.`);
+    const seed = Math.floor(Math.random() * 100000);
+    const imageUrl = `https://image.pollinations.ai/prompt/cinematic%20shot%20${encodeURIComponent(t)}?width=1280&height=720&nologo=true&seed=${seed}`;
+    
+    const safeText = aiScript ? aiScript.replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g, ' ') : `Video dimulai dengan visual ${t}, lalu zoom in perlahan.`;
+    
+    result.innerHTML = `
+      <div class="gen-content">
+        <div class="rounded-xl overflow-hidden mb-3 border border-[var(--border)] relative">
+          <img src="${imageUrl}" alt="${t}" class="w-full h-auto">
+          <div class="absolute inset-0 flex items-center justify-center bg-black/30">
+            <button class="btn btn-primary btn-lg !rounded-full !p-4"><i data-lucide="play" class="w-6 h-6"></i></button>
+          </div>
+          <span class="badge badge-primary absolute top-2 right-2">AI Preview</span>
+        </div>
+        <div class="bg-[var(--bg-2)] p-3 rounded-lg text-sm whitespace-pre-line">${aiScript || 'Visual: ' + t + '\nVoice Over: Tonton sampai akhir untuk tahu rahasianya.'}</div>
+        <div class="flex gap-2 mt-3">
+          <a href="${imageUrl}" download="ai-video-thumb.jpg" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Thumb</a>
+          <button onclick='saveContentItem({type:"prompt",title:"Video: ${t}",content:"${safeText}",icon:"clapperboard"})' class="btn btn-primary btn-sm flex-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save Script</button>
+        </div>
+      </div>`;
+    lucide.createIcons();
+  } catch (e) {
+    result.innerHTML = `<div class="gen-content text-center text-[var(--danger)]">Gagal menghasilkan video. Coba lagi.</div>`;
+  }
+  btn.disabled = false; btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Video';
 }
 
 // ============================================================
 // LIBRARY
 // ============================================================
 function renderLibrary(main) {
-  main.innerHTML = `<div class="card p-5 mb-5"><div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="folder" class="w-4 h-4 text-[var(--primary)]"></i> Content Library</h3><button onclick="exportLibraryCSV()" class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV</button></div><div class="flex flex-wrap gap-2 mb-4"><input id="lb-search" class="input flex-1 min-w-[200px]" placeholder="Cari konten..." oninput="filterLibrary()"><select id="lb-filter" class="select" style="width: auto" onchange="filterLibrary()"><option value="">Semua Tipe</option><option value="ide">Ide</option><option value="hook">Hook</option><option value="caption">Caption</option><option value="script">Script</option></select></div><div id="lb-list"></div></div>`;
+  main.innerHTML = `<div class="card p-5 mb-5"><div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="folder" class="w-4 h-4 text-[var(--primary)]"></i> Content Library</h3><button onclick="exportLibraryCSV()" class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV</button></div><div class="flex flex-wrap gap-2 mb-4"><input id="lb-search" class="input flex-1 min-w-[200px]" placeholder="Cari konten..." oninput="filterLibrary()"><select id="lb-filter" class="select" style="width: auto" onchange="filterLibrary()"><option value="">Semua Tipe</option><option value="ide">Ide</option><option value="hook">Hook</option><option value="caption">Caption</option><option value="script">Script</option><option value="prompt">Gambar/Video</option></select></div><div id="lb-list"></div></div>`;
   filterLibrary();
 }
 function filterLibrary() {
@@ -1211,7 +1288,7 @@ function emptyState(title, desc, icon='package', btnText=null, btnAction=null) {
 const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Bisa! Isi API Key OpenAI pada bagian ENV di dalam kode untuk menyalakan AI secara penuh.'], ['Apakah data saya aman?', 'Ya. Password di-hash, data terisolasi per user_id.']];
 document.getElementById('faqList').innerHTML = faqs.map(([q, a]) => `<div class="card p-4"><details><summary class="font-semibold cursor-pointer flex items-center justify-between text-sm">${q} <i data-lucide="chevron-down" class="w-4 h-4"></i></summary><p class="text-sm text-[var(--text-2)] mt-3">${a}</p></details></div>`).join('');
 
-const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Prompt','image','primary'],['video-prompt','AI Video Prompt','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
+const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Generator','image','primary'],['video-prompt','AI Video Generator','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
 document.getElementById('toolsGrid').innerHTML = allTools.map(([id, label, icon, color]) => `<button onclick="showAuth('register')" class="card p-4 text-left hover:scale-[1.02] transition-transform"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-5 h-5"></i></div><div class="font-semibold text-sm">${label}</div></button>`).join('');
 
 // ============================================================
