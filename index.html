@@ -105,20 +105,27 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 .nav-backdrop.show { opacity: 1; pointer-events: auto; }
 .skeleton { background: linear-gradient(90deg, var(--bg-2) 25%, var(--border) 50%, var(--bg-2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
 
-/* PERBAIKAN SIDEBAR MOBILE */
+/* PERBAIKAN MUTLAK SIDEBAR HP */
+.sidebar {
+  width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset-y: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 40;
+}
 @media (max-width: 1023px) { 
   .sidebar { 
-    position: fixed; 
     left: -300px; 
-    top: 0; 
-    bottom: 0; 
+    transition: left .3s ease; 
     z-index: 60; 
-    transition: left .3s; 
-    width: 260px; 
-    display: flex !important; /* Paksa tampil saat di-toggle */
   } 
   .sidebar.open { 
-    left: 0; 
+    left: 0 !important; 
   } 
 }
 </style>
@@ -241,7 +248,8 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 
 <!-- ====== APP (DASHBOARD) ====== -->
 <div id="app" class="hidden min-h-screen">
-  <aside class="sidebar hidden lg:flex w-[260px] bg-[var(--surface)] border-r border-[var(--border)] flex-col fixed inset-y-0 z-40">
+  <!-- Kelas Tailwind 'hidden' dan 'lg:flex' dihapus dari aside agar tidak bentrok dengan CSS mutlak di atas -->
+  <aside class="sidebar">
     <div class="h-16 flex items-center gap-3 px-5 border-b border-[var(--border)]"><div class="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center text-white"><i data-lucide="sparkles" class="w-5 h-5"></i></div><div><div class="font-bold text-sm leading-tight">FB PRO AI CREATOR</div><div class="text-[10px] text-[var(--text-3)]" id="userPackageLabel">Free Plan</div></div></div>
     <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-1" id="sidebarNav"></nav>
     <div class="p-3 border-t border-[var(--border)]"><button onclick="logout()" class="sidebar-item w-full"><i data-lucide="log-out" class="w-4 h-4"></i> Keluar</button></div>
@@ -542,10 +550,7 @@ function renderSidebar() {
 function openSidebar() { 
   const sidebar = document.querySelector('.sidebar');
   if (sidebar) {
-    sidebar.classList.remove('hidden'); 
-    setTimeout(() => {
-      sidebar.classList.add('open');
-    }, 10);
+    sidebar.classList.add('open');
   }
   document.getElementById('navBackdrop').classList.add('show'); 
 } 
@@ -1100,7 +1105,7 @@ async function generateImagePrompt() {
             <img src="${imageUrl}" alt="${t}" class="w-full h-auto">
           </div>
           <div class="flex gap-2">
-            <a href="${imageUrl}" download="ai-image.jpg" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download</a>
+            <a href="${imageUrl}" download="ai-image.jpg" target="_blank" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Download</a>
             <button onclick='saveContentItem({type:"prompt",title:"Image: ${t}",content:"${imageUrl}",icon:"image"})' class="btn btn-primary btn-sm flex-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save</button>
           </div>
         </div>`;
@@ -1157,7 +1162,7 @@ async function generateVideoPrompt() {
         </div>
         <div class="bg-[var(--bg-2)] p-3 rounded-lg text-sm whitespace-pre-line">${aiScript || 'Visual: ' + t + '\nVoice Over: Tonton sampai akhir untuk tahu rahasianya.'}</div>
         <div class="flex gap-2 mt-3">
-          <a href="${imageUrl}" download="ai-video-thumb.jpg" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Thumb</a>
+          <a href="${imageUrl}" download="ai-video-thumb.jpg" target="_blank" class="btn btn-secondary btn-sm flex-1"><i data-lucide="download" class="w-3.5 h-3.5"></i> Thumb</a>
           <button onclick='saveContentItem({type:"prompt",title:"Video: ${t}",content:"${safeText}",icon:"clapperboard"})' class="btn btn-primary btn-sm flex-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save Script</button>
         </div>
       </div>`;
