@@ -305,15 +305,15 @@ const STATE = {
 };
 
 const CONFIG = {
-  DEMO_MODE: !(window.ENV?.AI_API_KEY)
+  DEMO_MODE: !(window.ENV?.AI_API_KEY) // Catatan: AI_API_KEY sudah kamu hapus, jadi ini akan true (Demo AI Aktif)
 };
 
-const LocalDB = {
-  get(key, def=null) { try { const v = localStorage.getItem('fbpro_'+key); return v ? JSON.parse(v) : def; } catch { return def; } },
-  set(key, val) { localStorage.setItem('fbpro_'+key, JSON.stringify(val)); },
-  remove(key) { localStorage.removeItem('fbpro_'+key); }
-};
-
+// === TAMBAHKAN INI UNTUK MENGHUBUNGKAN KE SUPABASE ===
+let sb = null;
+if (window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY) {
+  sb = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
+}
+// ======================================================
 // ============================================================
 // THEME
 // ============================================================
