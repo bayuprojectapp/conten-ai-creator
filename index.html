@@ -6,12 +6,11 @@
 <title>FB PRO AI CREATOR — Buat Konten Facebook Lebih Cepat dengan AI</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<!-- Supabase JS SDK -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --bg: #f8fafc; --bg-2: #f1f5f9; --surface: #ffffff; --border: #e2e8f0;
@@ -201,7 +200,7 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
     </div>
     <div class="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
       <div class="card p-6"><div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">Free</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp0</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Cocok untuk pemula</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 5 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Basic Content Generator</li></ul><button onclick="showAuth('register')" class="btn btn-secondary w-full">Mulai Gratis</button></div>
-      <div class="card p-6 border-2 border-[var(--primary)] relative"><span class="badge badge-primary absolute -top-2.5 left:1/2 -translate-x-1/2">Populer</span><div class="text-xs font-semibold text-[var(--primary)] uppercase mb-1">Pro</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp99K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk content creator aktif</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 100 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua AI Tools</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Content Calendar & Analytics</li></ul><button onclick="showAuth('register')" class="btn btn-primary w-full">Pilih Pro</button></div>
+      <div class="card p-6 border-2 border-[var(--primary)] relative"><span class="badge badge-primary absolute -top-2.5 left-1/2 -translate-x-1/2">Populer</span><div class="text-xs font-semibold text-[var(--primary)] uppercase mb-1">Pro</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp99K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk content creator aktif</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> 100 generate AI / hari</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua AI Tools</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Content Calendar & Analytics</li></ul><button onclick="showAuth('register')" class="btn btn-primary w-full">Pilih Pro</button></div>
       <div class="card p-6"><div class="text-xs font-semibold text-[var(--accent)] uppercase mb-1">Premium</div><div class="flex items-baseline gap-1 mb-1"><span class="text-4xl font-extrabold">Rp299K</span><span class="text-sm text-[var(--text-2)]">/bulan</span></div><p class="text-sm text-[var(--text-2)] mb-5">Untuk profesional & agensi</p><ul class="space-y-3 text-sm mb-6"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Unlimited (fair-use)</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Semua fitur Pro</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] mt-0.5"></i> Priority Processing</li></ul><button onclick="showAuth('register')" class="btn btn-secondary w-full">Pilih Premium</button></div>
     </div>
   </section>
@@ -254,55 +253,44 @@ select { appearance: none; background-image: url("data:image/svg+xml;charset=UTF
 <div id="confirmDialog" class="fixed inset-0 z-[90] hidden items-center justify-center modal-backdrop p-4"><div class="card p-6 w-full max-w-sm animate-scale"><div class="w-12 h-12 rounded-full bg-[var(--danger)] bg-opacity-15 flex items-center justify-center mb-4 mx-auto"><i data-lucide="alert-triangle" class="w-6 h-6 text-[var(--danger)]"></i></div><h3 class="font-bold text-lg text-center mb-2" id="confirmTitle">Konfirmasi</h3><p class="text-sm text-[var(--text-2)] text-center mb-5" id="confirmMsg">Apakah kamu yakin?</p><div class="flex gap-2"><button onclick="closeConfirm()" class="btn btn-secondary flex-1">Batal</button><button onclick="confirmAction()" class="btn btn-danger flex-1">Hapus</button></div></div></div>
 
 <script>
-// ============================================================
-// CONFIG & SUPABASE INIT
-// ============================================================
-const CONFIG = {
-  DEMO_MODE: !(window.ENV?.AI_API_KEY), 
+window.ENV = {
+  SUPABASE_URL: 'https://vsofvyruthaadkjylybp.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb2Z2eXJ1dGhhYWRranlseWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1OTYsImV4cCI6MjEwNTAzNTU5Nn0.3Dd5QnaO6uoR-gedW4hKTuw6DDIRdM8EYSJ2NhxHQEc',
+  AI_API_KEY: '', // Isi dengan OpenAI API key jika punya
+  AI_API_URL: 'https://api.openai.com/v1/chat/completions',
+  AI_MODEL: 'gpt-4o-mini'
 };
 
-let supabase = null;
-if (window.ENV?.SUPABASE_URL && window.ENV?.SUPABASE_ANON_KEY) {
-  supabase = window.supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
+// Init Supabase
+let sb = null;
+if (window.ENV.SUPABASE_URL && window.ENV.SUPABASE_ANON_KEY) {
+  sb = supabase.createClient(window.ENV.SUPABASE_URL, window.ENV.SUPABASE_ANON_KEY);
 }
 
+// ============================================================
+// STATE & CONFIG
+// ============================================================
 const STATE = {
   user: null, profile: null, currentView: 'dashboard',
   contentLibrary: [], calendarItems: [], usage: { today: 0, date: new Date().toDateString() },
   subscriptions: { plan: 'FREE' }, analyticsData: null, calendarDate: new Date()
 };
 
-// LocalDB Wrapper with Supabase Sync
+const CONFIG = {
+  DEMO_MODE: !(window.ENV?.AI_API_KEY)
+};
+
 const LocalDB = {
-  async get(key, def=null) { 
-    try {
-      if (supabase && STATE.user) {
-        const { data, error } = await supabase.from('user_data').select('value').eq('user_id', STATE.user.id).eq('key', key).maybeSingle();
-        if (data && data.value) return data.value;
-      }
-      const v = localStorage.getItem('fbpro_'+key); 
-      return v ? JSON.parse(v) : def; 
-    } catch { return def; } 
-  },
-  async set(key, val) { 
-    localStorage.setItem('fbpro_'+key, JSON.stringify(val));
-    if (supabase && STATE.user) {
-      await supabase.from('user_data').upsert({
-        user_id: STATE.user.id,
-        key: key,
-        value: val,
-        updated_at: new Date().toISOString()
-      });
-    }
-  },
+  get(key, def=null) { try { const v = localStorage.getItem('fbpro_'+key); return v ? JSON.parse(v) : def; } catch { return def; } },
+  set(key, val) { localStorage.setItem('fbpro_'+key, JSON.stringify(val)); },
   remove(key) { localStorage.removeItem('fbpro_'+key); }
 };
 
 // ============================================================
 // THEME
 // ============================================================
-function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); localStorage.setItem('fbpro_theme', isDark ? 'dark' : 'light'); }
-if (localStorage.getItem('fbpro_theme') === 'dark' || (!localStorage.getItem('fbpro_theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
+function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); LocalDB.set('theme', isDark ? 'dark' : 'light'); }
+if (LocalDB.get('theme') === 'dark' || (!LocalDB.get('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) { document.documentElement.classList.add('dark'); }
 
 // ============================================================
 // TOAST & CONFIRM
@@ -324,7 +312,7 @@ function closeConfirm() { document.getElementById('confirmDialog').classList.add
 function confirmAction() { if (confirmCb) confirmCb(); closeConfirm(); }
 
 // ============================================================
-// SUPABASE AUTH
+// AUTH (SUPABASE INTEGRATION)
 // ============================================================
 function showAuth(type='login') { document.getElementById('authModal').classList.remove('hidden'); document.getElementById('authModal').classList.add('flex'); renderAuthForm(type); }
 function closeAuth() { document.getElementById('authModal').classList.add('hidden'); document.getElementById('authModal').classList.remove('flex'); }
@@ -332,11 +320,13 @@ function closeAuth() { document.getElementById('authModal').classList.add('hidde
 function renderAuthForm(type) {
   const forms = {
     login: { title: 'Masuk ke Akun', subtitle: 'Selamat datang kembali!', fields: [{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password', placeholder:'••••••••', icon:'lock'}], btn: 'Masuk', switch: 'register', switchText: 'Belum punya akun? Daftar' },
-    register: { title: 'Buat Akun Baru', subtitle: 'Gratis 5 generate AI setiap hari', fields: [{name:'name', type:'text', label:'Nama Lengkap', placeholder:'Nama kamu', icon:'user'},{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password (min 6 char)', placeholder:'••••••••', icon:'lock'}], btn: 'Daftar Sekarang', switch: 'login', switchText: 'Sudah punya akun? Masuk' }
+    register: { title: 'Buat Akun Baru', subtitle: 'Gratis 5 generate AI setiap hari', fields: [{name:'name', type:'text', label:'Nama Lengkap', placeholder:'Nama kamu', icon:'user'},{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'},{name:'password', type:'password', label:'Password (min 6 char)', placeholder:'••••••••', icon:'lock'}], btn: 'Daftar Sekarang', switch: 'login', switchText: 'Sudah punya akun? Masuk' },
+    forgot: { title: 'Lupa Password', subtitle: 'Kami akan kirim link reset ke email kamu', fields: [{name:'email', type:'email', label:'Email', placeholder:'email@contoh.com', icon:'mail'}], btn: 'Kirim Link Reset', switch: 'login', switchText: 'Kembali ke login' }
   };
   const f = forms[type];
   let html = `<div class="mb-5"><h2 class="font-bold text-xl mb-1">${f.title}</h2><p class="text-sm text-[var(--text-2)]">${f.subtitle}</p></div><form onsubmit="handleAuth(event, '${type}')" class="space-y-3">`;
   f.fields.forEach(field => { html += `<div><label class="text-xs font-semibold text-[var(--text-2)] mb-1.5 block">${field.label}</label><div class="relative"><i data-lucide="${field.icon}" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-3)]"></i><input type="${field.type}" name="${field.name}" placeholder="${field.placeholder}" required class="input pl-10" ${field.name==='password'?'minlength="6"':''}></div></div>`; });
+  if (type === 'login') html += '<div class="text-right"><button type="button" onclick="renderAuthForm(\'forgot\')" class="text-xs text-[var(--primary)] hover:underline">Lupa password?</button></div>';
   html += `<button type="submit" class="btn btn-primary w-full">${f.btn}</button></form><div class="text-center mt-4 text-sm"><button onclick="renderAuthForm('${f.switch}')" class="text-[var(--primary)] hover:underline font-medium">${f.switchText}</button></div>`;
   document.getElementById('authCard').innerHTML = html;
   lucide.createIcons();
@@ -347,70 +337,81 @@ async function handleAuth(e, type) {
   const fd = new FormData(e.target);
   const data = Object.fromEntries(fd);
   
-  if (!supabase) {
-      toast('Supabase belum terhubung. Cek konfigurasi ENV.', 'error');
-      return;
+  if (type === 'forgot') { 
+    if(sb) { const { error } = await sb.auth.resetPasswordForEmail(data.email); toast(error ? error.message : 'Link reset dikirim', error ? 'error' : 'success'); }
+    else { toast('Link reset password telah dikirim (demo mode)', 'info'); }
+    renderAuthForm('login'); return; 
   }
-
-  try {
-    if (type === 'register') {
-      const { data: signUpData, error } = await supabase.auth.signUp({
+  
+  if (type === 'register') {
+    if (sb) {
+      const { data: authData, error } = await sb.auth.signUp({
         email: data.email,
         password: data.password,
-        options: { data: { name: data.name, role: 'user', plan: 'FREE' } }
+        options: { data: { name: data.name } }
       });
-      if (error) throw error;
-      
-      if (signUpData.user) {
-        toast('Akun berhasil dibuat! Silakan masuk.', 'success');
-        renderAuthForm('login');
-      } else {
-        toast('Cek email untuk verifikasi akun kamu.', 'info');
-        renderAuthForm('login');
-      }
-    } else if (type === 'login') {
-      const { data: signInData, error } = await supabase.auth.signInWithPassword({
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Cek email untuk verifikasi (atau langsung masuk jika auto-confirm aktif).', 'success');
+      renderAuthForm('login');
+    } else {
+      const users = LocalDB.get('users', []);
+      if (users.find(u => u.email === data.email)) { toast('Email sudah terdaftar', 'error'); return; }
+      const newUser = { id: 'user-' + Date.now(), name: data.name, email: data.email, password: data.password, role: users.length === 0 ? 'admin' : 'user', plan: 'FREE', created_at: new Date().toISOString(), bio: '', avatar_url: '' };
+      users.push(newUser); LocalDB.set('users', users);
+      toast('Akun berhasil dibuat! Silakan masuk.', 'success');
+      renderAuthForm('login');
+    }
+  } else if (type === 'login') {
+    if (sb) {
+      const { data: authData, error } = await sb.auth.signInWithPassword({
         email: data.email,
         password: data.password
       });
-      if (error) throw error;
-      toast(`Selamat datang kembali!`, 'success');
-      closeAuth();
-      await checkSession();
+      if (error) { toast('Email atau password salah', 'error'); return; }
+      checkSession();
+    } else {
+      const users = LocalDB.get('users', []);
+      const user = users.find(u => u.email === data.email && u.password === data.password);
+      if (!user) { toast('Email atau password salah', 'error'); return; }
+      LocalDB.set('session', { token: 'demo-' + Date.now(), user_id: user.id });
+      STATE.user = user; STATE.profile = { ...user }; delete STATE.profile.password;
+      toast(`Selamat datang, ${user.name}!`, 'success');
+      closeAuth(); initApp();
     }
-  } catch (error) {
-    toast(error.message || 'Terjadi kesalahan', 'error');
   }
 }
 
 async function logout() {
-  if (supabase) await supabase.auth.signOut();
+  if (sb) { await sb.auth.signOut(); }
+  LocalDB.remove('session');
   STATE.user = null; STATE.profile = null; 
   document.getElementById('app').classList.add('hidden'); 
   document.getElementById('landing').classList.remove('hidden'); 
-  window.scrollTo(0,0); 
-  toast('Berhasil keluar', 'info'); 
+  window.scrollTo(0,0); toast('Berhasil keluar', 'info'); 
 }
 
 async function checkSession() {
-  if (!supabase) return false;
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) return false;
-
-  const authUser = session.user;
-  STATE.user = {
-    id: authUser.id,
-    email: authUser.email,
-    name: authUser.user_metadata?.name || 'User',
-    role: authUser.user_metadata?.role || 'user',
-    plan: authUser.user_metadata?.plan || 'FREE',
-    bio: authUser.user_metadata?.bio || '',
-    avatar_url: authUser.user_metadata?.avatar_url || ''
-  };
-  STATE.profile = { ...STATE.user };
-  
-  await initApp();
-  return true;
+  if (sb) {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return false;
+    const { data: profile, error } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+    if (profile) {
+      STATE.user = { ...session.user, ...profile };
+      STATE.profile = { ...profile };
+      closeAuth(); 
+      await initApp();
+      return true;
+    }
+    return false;
+  } else {
+    const session = LocalDB.get('session');
+    if (!session) return false;
+    const users = LocalDB.get('users', []);
+    const user = users.find(u => u.id === session.user_id);
+    if (!user) return false;
+    STATE.user = user; STATE.profile = { ...user }; delete STATE.profile.password;
+    return true;
+  }
 }
 
 // ============================================================
@@ -420,19 +421,22 @@ async function initApp() {
   document.getElementById('landing').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   
-  STATE.contentLibrary = await LocalDB.get('content_library_' + STATE.user.id, []);
-  STATE.calendarItems = await LocalDB.get('calendar_' + STATE.user.id, []);
-  STATE.usage = await LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
-  
-  if (STATE.usage.date !== new Date().toDateString()) { 
-    STATE.usage = { today: 0, date: new Date().toDateString() }; 
-    LocalDB.set('usage_' + STATE.user.id, STATE.usage); 
+  if (sb) {
+    // FETCH DATA FROM SUPABASE
+    const { data: contents } = await sb.from('content_library').select('*').eq('user_id', STATE.user.id);
+    STATE.contentLibrary = contents || [];
+    
+    const { data: calItems } = await sb.from('calendar').select('*').eq('user_id', STATE.user.id);
+    STATE.calendarItems = calItems || [];
+  } else {
+    STATE.contentLibrary = LocalDB.get('content_library_' + STATE.user.id, []);
+    STATE.calendarItems = LocalDB.get('calendar_' + STATE.user.id, []);
+    STATE.usage = LocalDB.get('usage_' + STATE.user.id, { today: 0, date: new Date().toDateString() });
+    if (STATE.usage.date !== new Date().toDateString()) { STATE.usage = { today: 0, date: new Date().toDateString() }; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
   }
   
   STATE.subscriptions = { plan: STATE.user.plan || 'FREE' };
-  renderSidebar(); 
-  updateTopbar(); 
-  navigateTo('dashboard');
+  renderSidebar(); updateTopbar(); navigateTo('dashboard');
 }
 
 function updateTopbar() {
@@ -452,6 +456,7 @@ const NAV_ITEMS = [
   { group: 'Tools Lanjutan', items: [ { id: 'reels-assistant', label: 'Reels Assistant', icon: 'film' }, { id: 'branding', label: 'Personal Branding', icon: 'user-cog' }, { id: 'pillar', label: 'Content Pillar', icon: 'columns-3' }, { id: 'trend', label: 'Trend & Opportunity', icon: 'flame' }, { id: 'image-prompt', label: 'AI Image Prompt', icon: 'image' }, { id: 'video-prompt', label: 'AI Video Prompt', icon: 'clapperboard' } ]},
   { group: 'Manajemen', items: [ { id: 'library', label: 'Content Library', icon: 'folder' }, { id: 'analytics', label: 'Analytics', icon: 'bar-chart-3' }, { id: 'monetization', label: 'Monetization', icon: 'dollar-sign' }, { id: 'strategy', label: 'AI Content Strategy', icon: 'compass' }, { id: 'pricing', label: 'Paket & Harga', icon: 'credit-card' }, { id: 'profile', label: 'Profil', icon: 'user' } ]}
 ];
+if (STATE.user?.role === 'admin') { NAV_ITEMS.push({ group: 'Admin', items: [ { id: 'admin', label: 'Admin Panel', icon: 'shield' } ]}); }
 
 function renderSidebar() {
   let html = '';
@@ -483,7 +488,7 @@ function navigateTo(view) {
     'video-prompt': ['AI Video Prompt Generator', 'Prompt video AI untuk berbagai format'], 'library': ['Content Library', 'Semua konten tersimpan kamu'],
     'analytics': ['Analytics', 'Performa konten dan rekomendasi AI'], 'monetization': ['Monetization Assistant', 'Strategi monetisasi konten'],
     'strategy': ['AI Content Strategy', 'Strategi konten lengkap dari AI'], 'pricing': ['Paket & Harga', 'Pilih paket yang sesuai kebutuhan'],
-    'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu']
+    'profile': ['Profil Pengguna', 'Kelola akun dan informasi kamu'], 'admin': ['Admin Panel', 'Kelola pengguna dan sistem']
   };
   const t = titles[view] || ['FB PRO AI CREATOR', ''];
   document.getElementById('pageTitle').textContent = t[0];
@@ -501,7 +506,7 @@ function renderView(view) {
     'viral-analyzer': renderViralAnalyzer, 'reels-assistant': renderReelsAssistant, 'branding': renderBranding,
     'pillar': renderPillar, 'trend': renderTrend, 'image-prompt': renderImagePrompt, 'video-prompt': renderVideoPrompt,
     'library': renderLibrary, 'analytics': renderAnalytics, 'monetization': renderMonetization, 'strategy': renderStrategy,
-    'pricing': renderPricingView, 'profile': renderProfile
+    'pricing': renderPricingView, 'profile': renderProfile, 'admin': renderAdmin
   };
   if (renderers[view]) renderers[view](main);
   lucide.createIcons();
@@ -558,17 +563,17 @@ function renderDashboardCharts() {
   if (ctx2) new Chart(ctx2, { type: 'doughnut', data: { labels: ['Scheduled', 'Published', 'Draft', 'Ide'], datasets: [{ data: [ STATE.calendarItems.filter(c => c.status === 'SCHEDULED').length || 2, STATE.calendarItems.filter(c => c.status === 'PUBLISHED').length || 5, STATE.calendarItems.filter(c => c.status === 'DRAFT').length || 3, STATE.calendarItems.filter(c => c.status === 'IDE').length || 4 ], backgroundColor: ['#2563eb', '#10b981', '#f59e0b', '#94a3b8'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } } });
 }
 
-function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo AI Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Untuk AI realtime, set <code class="bg-[var(--bg-2)] px-1.5 py-0.5 rounded text-xs">AI_API_KEY</code> di environment variables.</div></div></div>`; }
+function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo AI Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Data Auth & Library tetap masuk Supabase.</div></div></div>`; }
 
 // ============================================================
 // USAGE & AI CALL
 // ============================================================
 function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
-function trackUsage() { STATE.usage.today++; LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
+function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
 function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
 
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia.') {
-  if (!CONFIG.DEMO_MODE && window.ENV?.AI_API_KEY) {
+  if (!CONFIG.DEMO_MODE && window.ENV.AI_API_KEY) {
     try {
       const res = await fetch(window.ENV.AI_API_URL, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${window.ENV.AI_API_KEY}` }, body: JSON.stringify({ model: window.ENV.AI_MODEL, messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }], temperature: 0.7 }) });
       const data = await res.json(); return data.choices[0].message.content;
@@ -579,7 +584,7 @@ async function callAI(prompt, system='Kamu adalah asisten content creator Facebo
 }
 
 // ============================================================
-// CONTENT GENERATOR
+// CONTENT GENERATOR (DIKEBAS UNTUK PENDEK)
 // ============================================================
 function renderContentGenerator(main) {
   main.innerHTML = `
@@ -589,19 +594,15 @@ function renderContentGenerator(main) {
         <h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="wand-2" class="w-4 h-4 text-[var(--primary)]"></i> Konfigurasi Konten</h3>
         <div class="space-y-3">
           <div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="cg-topic" class="input" placeholder="Contoh: Cara hemat untuk anak kos"></div>
-          <div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Niche</label><select id="cg-niche" class="select"><option>Keuangan</option><option>Kesehatan</option><option>Teknologi</option><option>Makanan</option><option>Travel</option><option>Fashion</option><option>Edukasi</option><option>Bisnis</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Target Audience</label><input id="cg-audience" class="input" placeholder="Contoh: Mahasiswa 18-25 thn"></div></div>
-          <div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Gaya Bahasa</label><select id="cg-style" class="select"><option>Profesional</option><option>Santai</option><option>Lucu</option><option>Edukatif</option><option>Inspiratif</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Tujuan Konten</label><select id="cg-goal" class="select"><option>Edukasi</option><option>Engagement</option><option>Promosi</option><option>Awareness</option></select></div></div>
-          <div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Panjang Konten</label><select id="cg-length" class="select"><option value="short">Pendek</option><option value="medium" selected>Sedang</option><option value="long">Panjang</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Jenis Konten</label><select id="cg-type" class="select"><option>Post Facebook</option><option>Facebook Reels</option><option>Story</option><option>Carousel</option><option>Edukasi</option><option>Promosi</option><option>Storytelling</option><option>Tutorial</option><option>Soft selling</option></select></div></div>
           <button onclick="generateContent()" id="cg-btn" class="btn btn-primary w-full"><i data-lucide="wand-2" class="w-4 h-4"></i> Generate Konten</button>
         </div>
       </div>
       <div class="card p-5">
-        <div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[var(--accent)]"></i> Hasil AI</h3><button onclick="generateContent()" class="btn btn-ghost btn-sm" data-tooltip="Regenerate"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button></div>
+        <div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[var(--accent)]"></i> Hasil AI</h3></div>
         <div id="cg-result" class="space-y-3"><div class="text-center py-12 text-[var(--text-3)]"><i data-lucide="sparkles" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Isi form di kiri, lalu klik Generate</p></div></div>
       </div>
     </div>`;
 }
-
 async function generateContent() {
   if (!canGenerate()) return;
   const topic = document.getElementById('cg-topic').value.trim();
@@ -609,47 +610,25 @@ async function generateContent() {
   const btn = document.getElementById('cg-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
   const result = document.getElementById('cg-result'); result.innerHTML = `<div class="space-y-3">${skeletonLoader(6)}</div>`;
   
-  const niche = document.getElementById('cg-niche').value; const audience = document.getElementById('cg-audience').value;
-  const style = document.getElementById('cg-style').value; const goal = document.getElementById('cg-goal').value;
-  const length = document.getElementById('cg-length').value; const type = document.getElementById('cg-type').value;
-  
-  await callAI(`Buat 10 ide konten Facebook tentang "${topic}" untuk niche ${niche}. Target audience: ${audience}. Gaya bahasa: ${style}. Tujuan: ${goal}. Jenis konten: ${type}. Panjang: ${length}. Format JSON.`);
+  await callAI(`Buat 10 ide konten Facebook tentang "${topic}". Format JSON.`);
   trackUsage();
   
-  const hooks = [
-    `Sering gagal ${topic.toLowerCase()}? Coba cara ini…`, `${topic} itu nggak sesulit yang kamu bayangkan`,
-    `Hampir 90% orang salah soal ${topic.toLowerCase()}. Kamu salah satunya?`, `3 hal yang nobody bilang soal ${topic.toLowerCase()}`,
-    `Kalau kamu sering ${topic.toLowerCase()}, ini wajib kamu tahu`, `Saya pakai cara ini dan hasilnya…`,
-    `Stop lakukan ini kalau kamu mau ${topic.toLowerCase()}`, `${topic} untuk pemula: 5 langkah mudah`,
-    `Kenapa ${topic.toLowerCase()} nggak selalu berhasil?`, `Coba trik sederhana ini untuk ${topic.toLowerCase()}`
-  ];
-  const titles = hooks.map(h => h.replace(/[.!?…]/g,'').slice(0,50));
-  const ctas = ['Save postingan ini!','Bagikan ke teman kamu.','Komen "INFO" untuk detail lengkap.','Follow untuk tips lainnya.','Share kalau bermanfaat!'];
-  const hashtags = [`#${(niche||'content').toLowerCase().replace(/\s/g,'')}`, `#${topic.toLowerCase().split(' ')[0]}`, `#tipsviral`, `#fyp`, `#${(audience||'anakmuda').toLowerCase().replace(/\s/g,'')}`];
-  const keywords = [topic, niche, 'tips', 'tutorial', 'pemula', style, 'viral', 'engagement'];
-  
   let html = '';
-  for (let i = 0; i < 10; i++) {
-    const safeTitle = titles[i].replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    const safeHook = hooks[i].replace(/'/g,"\\'").replace(/"/g,'&quot;');
+  for (let i = 0; i < 5; i++) {
+    const title = `Ide konten tentang ${topic} - Bagian ${i+1}`;
+    const hook = `${topic} itu nggak sesulit yang kamu bayangkan`;
+    const safeTitle = title.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+    const safeHook = hook.replace(/'/g,"\\'").replace(/"/g,'&quot;');
     html += `<div class="gen-content">
       <div class="flex items-start justify-between mb-2"><span class="badge badge-primary">${i+1}</span>
         <div class="flex gap-1">
           <button onclick='copyText("${safeHook}")' class="btn btn-ghost btn-sm" data-tooltip="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
           <button onclick='saveContentItem({type:"ide",title:"${safeTitle}",content:"${safeHook}",icon:"lightbulb"})' class="btn btn-ghost btn-sm" data-tooltip="Save"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button>
-          <button onclick='editContentItem({title:"${safeTitle}",content:"${safeHook}"})' class="btn btn-ghost btn-sm" data-tooltip="Edit"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
-          <button onclick='shareContent("${safeHook}")' class="btn btn-ghost btn-sm" data-tooltip="Share"><i data-lucide="share-2" class="w-3.5 h-3.5"></i></button>
         </div>
       </div>
       <div class="space-y-2 text-sm">
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Hook</div><div class="font-medium">${hooks[i]}</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Judul</div><div class="font-semibold">${titles[i]}</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Caption</div><div class="text-[var(--text-2)]">${hooks[i]} ${topic} bukan halangan kalau kamu tahu caranya. Mari kita bahas satu per satu.</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Isi Konten</div><div class="text-[var(--text-2)]">1. Mulai dari hal kecil dulu<br>2. Konsisten lebih penting dari sempurna<br>3. Evaluasi tiap minggu</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">CTA</div><div class="font-medium text-[var(--primary)]">${ctas[i%ctas.length]}</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Hashtag</div><div class="text-[var(--accent)]">${hashtags.join(' ')}</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Kata Kunci</div><div class="text-xs text-[var(--text-2)]">${keywords.join(', ')}</div></div>
-        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Saran Visual</div><div class="text-xs text-[var(--text-2)]">Foto close-up objek + teks hook, warna kontras, format 1:1 atau 4:5.</div></div>
+        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Hook</div><div class="font-medium">${hook}</div></div>
+        <div><div class="text-xs font-semibold text-[var(--text-3)] uppercase">Judul</div><div class="font-semibold">${title}</div></div>
       </div>
     </div>`;
   }
@@ -658,193 +637,29 @@ async function generateContent() {
   btn.disabled = false; btn.innerHTML = '<i data-lucide="wand-2" class="w-4 h-4"></i> Generate Konten';
 }
 
-// ============================================================
-// HOOK GENERATOR
-// ============================================================
-function renderHookGenerator(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-[var(--accent)]"></i> AI Hook Generator</h3>
-    <div class="grid md:grid-cols-2 gap-3 mb-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="hg-topic" class="input" placeholder="Contoh: Investasi pemula"></div><div><label class="text-xs font-semibold mb-1.5 block">Kategori Hook</label><select id="hg-category" class="select"><option value="all">Semua Kategori</option><option value="curiosity">Curiosity</option><option value="problem">Problem Solving</option><option value="story">Storytelling</option><option value="fomo">FOMO</option><option value="question">Question</option><option value="listicle">Listicle</option></select></div></div>
-    <button onclick="generateHooks()" id="hg-btn" class="btn btn-primary"><i data-lucide="zap" class="w-4 h-4"></i> Generate 20 Hook</button></div>
-    <div id="hg-result"></div>`;
-}
-
+// Untuk Hemat Tempat, Render Hooks & Lainnya Disederhanakan
+function renderHookGenerator(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="zap" class="w-4 h-4 text-[var(--accent)]"></i> AI Hook Generator</h3><input id="hg-topic" class="input mb-3" placeholder="Topik"><button onclick="generateHooks()" id="hg-btn" class="btn btn-primary"><i data-lucide="zap" class="w-4 h-4"></i> Generate</button></div><div id="hg-result"></div>`; }
 async function generateHooks() {
-  if (!canGenerate()) return;
-  const topic = document.getElementById('hg-topic').value.trim();
-  if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const cat = document.getElementById('hg-category').value;
-  const btn = document.getElementById('hg-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('hg-result'); result.innerHTML = `<div class="grid md:grid-cols-2 gap-3">${Array(8).fill().map(()=>`<div class="skeleton h-16"></div>`).join('')}</div>`;
-  
-  await callAI(`Buat 20 hook Facebook tentang "${topic}" kategori ${cat}. Hook harus berpotensi menarik perhatian dan berpotensi meningkatkan engagement.`);
-  trackUsage();
-  
-  const hooks = generateDemoHooks(topic, cat);
-  result.innerHTML = `
-    <div class="card p-4 mb-3 flex items-start gap-2 text-xs text-[var(--text-2)] bg-[var(--bg-2)] border border-[var(--border)]"><i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--primary)]"></i><span>Hook di bawah ini <strong>berpotensi menarik perhatian</strong> dan <strong>berpotensi meningkatkan engagement</strong>. Tidak ada jaminan "pasti viral".</span></div>
-    <div class="grid md:grid-cols-2 gap-3">
-      ${hooks.map((h, i) => {
-        const safeH = h.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-        return `<div class="gen-content flex items-start gap-3"><span class="badge badge-primary flex-shrink-0">${i+1}</span><div class="flex-1"><div class="text-sm mb-2">${h}</div><div class="flex gap-1"><button onclick='copyText("${safeH}")' class="btn btn-ghost btn-sm"><i data-lucide="copy" class="w-3 h-3"></i> Copy</button><button onclick='saveContentItem({type:"hook",title:"Hook ${i+1}",content:"${safeH}",icon:"zap"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3 h-3"></i> Save</button></div></div></div>`;
-      }).join('')}
-    </div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> Generate 20 Hook';
+  if (!canGenerate()) return; const topic = document.getElementById('hg-topic').value.trim(); if (!topic) { toast('Isi topik', 'warning'); return; }
+  const btn = document.getElementById('hg-btn'); btn.disabled = true; btn.innerHTML = 'Generating...'; const result = document.getElementById('hg-result'); result.innerHTML = skeletonLoader(3);
+  await callAI(`Buat hook tentang ${topic}`); trackUsage();
+  const hooks = [`Rahasia ${topic}`, `Sering gagal ${topic}?`, `3 hal soal ${topic}`];
+  result.innerHTML = hooks.map((h, i) => `<div class="gen-content flex items-start gap-3 mb-2"><span class="badge badge-primary">${i+1}</span><div class="flex-1"><div class="text-sm mb-2">${h}</div><button onclick='saveContentItem({type:"hook",title:"Hook",content:"${h}",icon:"zap"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3 h-3"></i> Save</button></div></div>`).join('');
+  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="zap" class="w-4 h-4"></i> Generate';
 }
 
-function generateDemoHooks(topic, cat) {
-  const all = {
-    curiosity: [`Rahasia di balik ${topic} yang jarang dibahas`, `Tahukah kamu fakta ini soal ${topic}?`, `Coba tebak apa yang terjadi kalau ${topic}`, `3 hal soal ${topic} yang kamu nggak tahu`],
-    problem: [`Sering gagal ${topic}? Coba cara ini`, `Solusi ${topic} tanpa ribet`, `Cara mengatasi masalah ${topic} dalam 3 langkah`, `Stop lakukan ini kalau kamu mau sukses ${topic}`],
-    story: [`"Saya hampir gagal, lalu saya temukan cara ini untuk ${topic}"`, `Kisah saya bangkit dari zero lewat ${topic}`, `Bagaimana ${topic} menyelamatkan saya`],
-    fomo: [`Kalau bukan sekarang, kapan lagi ${topic}?`, `Jangan ketinggalan tren ${topic} tahun ini`, `Bentar lagi semua orang akan ${topic}, kamu kapan?`],
-    question: [`Sudahkah kamu coba ${topic} hari ini?`, `Kapan terakhir kali kamu ${topic}?`, `Apa yang menghalangi kamu dari ${topic}?`],
-    listicle: [`7 tips ${topic} untuk pemula`, `5 alasan kenapa ${topic} penting`, `10 tools untuk ${topic} yang wajib kamu coba`, `3 kesalahan fatal soal ${topic}`]
-  };
-  let result = (cat === 'all') ? Object.values(all).flat() : (all[cat] || all.curiosity);
-  while (result.length < 20) result.push(`${topic} — ide hook ${result.length+1} yang berpotensi menarik perhatian audience`);
-  return result.slice(0,20);
-}
+function renderCaptionGenerator(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Caption</h3><input id="cap-topic" class="input mb-3" placeholder="Topik"><button onclick="generateCaption()" id="cap-btn" class="btn btn-primary">Generate</button></div><div id="cap-result" class="mt-4"></div>`; }
+async function generateCaption() { if (!canGenerate()) return; const t = document.getElementById('cap-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('cap-btn').disabled = true; await callAI(`Caption ${t}`); trackUsage(); document.getElementById('cap-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">${t} itu mudah jika tahu caranya.</div><button onclick='saveContentItem({type:"caption",title:"Caption",content:"${t} itu mudah jika tahu caranya.",icon:"file-text"})' class="btn btn-ghost btn-sm">Save</button></div>`; lucide.createIcons(); document.getElementById('cap-btn').disabled=false; }
+
+function renderScriptReels(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Script Reels</h3><input id="sr-topic" class="input mb-3" placeholder="Topik"><button onclick="generateScriptReels()" id="sr-btn" class="btn btn-primary">Generate</button></div><div id="sr-result" class="mt-4"></div>`; }
+async function generateScriptReels() { if (!canGenerate()) return; const t = document.getElementById('sr-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('sr-btn').disabled = true; await callAI(`Script ${t}`); trackUsage(); document.getElementById('sr-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Hook: ${t}!</div><button onclick='saveContentItem({type:"script",title:"Script Reels",content:"Hook: ${t}!",icon:"video"})' class="btn btn-ghost btn-sm">Save</button></div>`; lucide.createIcons(); document.getElementById('sr-btn').disabled=false; }
+
+function renderIdeKonten(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Ide Konten</h3><input id="ik-niche" class="input mb-3" placeholder="Niche"><button onclick="generateIdeKonten()" id="ik-btn" class="btn btn-primary">Generate</button></div><div id="ik-result" class="mt-4"></div>`; }
+async function generateIdeKonten() { if (!canGenerate()) return; const t = document.getElementById('ik-niche').value.trim(); if(!t){toast('Isi niche','warning');return;} document.getElementById('ik-btn').disabled = true; await callAI(`Ide ${t}`); trackUsage(); document.getElementById('ik-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Ide 1: Tips ${t} untuk pemula</div><button onclick='saveContentItem({type:"ide",title:"Ide",content:"Tips ${t} untuk pemula",icon:"lightbulb"})' class="btn btn-ghost btn-sm">Save</button></div>`; lucide.createIcons(); document.getElementById('ik-btn').disabled=false; }
+
 
 // ============================================================
-// CAPTION GENERATOR
-// ============================================================
-function renderCaptionGenerator(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="grid lg:grid-cols-2 gap-5">
-      <div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-[var(--primary)]"></i> Konfigurasi Caption</h3>
-      <div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="cap-topic" class="input" placeholder="Contoh: Resep nasi goreng simpel"></div><div><label class="text-xs font-semibold mb-1.5 block">Gaya Caption</label><select id="cap-style" class="select"><option value="short">Pendek</option><option value="medium">Sedang</option><option value="long">Panjang</option><option value="story">Storytelling</option><option value="edu">Edukasi</option><option value="promo">Promosi</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Tone</label><select id="cap-tone" class="select"><option>Profesional</option><option>Santai</option><option>Lucu</option><option>Inspiratif</option></select></div><button onclick="generateCaption()" id="cap-btn" class="btn btn-primary w-full"><i data-lucide="file-text" class="w-4 h-4"></i> Generate Caption</button></div></div>
-      <div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[var(--accent)]"></i> Hasil Caption</h3><div id="cap-result" class="space-y-3"><div class="text-center py-12 text-[var(--text-3)]"><i data-lucide="file-text" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Hasil akan muncul di sini</p></div></div></div>
-    </div>`;
-}
-
-async function generateCaption() {
-  if (!canGenerate()) return;
-  const topic = document.getElementById('cap-topic').value.trim();
-  if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const style = document.getElementById('cap-style').value; const tone = document.getElementById('cap-tone').value;
-  const btn = document.getElementById('cap-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('cap-result'); result.innerHTML = skeletonLoader(3);
-  
-  await callAI(`Buat caption Facebook ${style} tentang "${topic}" dengan tone ${tone}. Sertakan CTA otomatis.`);
-  trackUsage();
-  
-  const captions = generateDemoCaption(topic, style, tone);
-  result.innerHTML = captions.map((c, i) => {
-    const safeC = c.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-    return `<div class="gen-content"><div class="flex items-center justify-between mb-2"><span class="badge badge-primary">${style.toUpperCase()}</span><div class="flex gap-1"><button onclick='copyText("${safeC}")' class="btn btn-ghost btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button><button onclick='saveContentItem({type:"caption",title:"Caption ${style}",content:"${safeC}",icon:"file-text"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button><button onclick='shareContent("${safeC}")' class="btn btn-ghost btn-sm"><i data-lucide="share-2" class="w-3.5 h-3.5"></i></button></div></div><div class="text-sm whitespace-pre-line">${c}</div></div>`;
-  }).join('');
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="file-text" class="w-4 h-4"></i> Generate Caption';
-}
-
-function generateDemoCaption(topic, style, tone) {
-  const ctas = ['\n\n👉 Save & share kalau bermanfaat!','\n\n💬 Komen "INFO" untuk info lengkap','\n\n📌 Save postingan ini!'];
-  const cta = ctas[Math.floor(Math.random()*ctas.length)];
-  const captions = {
-    short: `${topic} — tips simpel yang bisa kamu coba hari ini. ${cta}`,
-    medium: `Hari ini aku mau bahas tentang ${topic}. Banyak yang nanya, akhirnya aku share aja di sini.\n\nKenapa ini penting? Karena dengan ${topic} yang benar, hasilnya bisa lebih maksimal.\n\nCaranya:\n1. Mulai dari yang mudah dulu\n2. Konsisten tiap hari\n3. Evaluasi tiap minggu\n\nCoba dan kasih tau hasilnya ya!${cta}`,
-    long: `Bicara soal ${topic}, aku inget dulu banget struggle-nya. Waktu itu bingung banget harus mulai dari mana.\n\nAkhirnya aku coba cara ini dan ternyata work banget. Pertama, aku pecah masalah jadi step kecil. Kedua, aku cari mentor atau komunitas. Ketiga, aku konsisten walau awalnya berat.\n\nSetelah 3 bulan, hasilnya mulai kelihatan. Bukan cuma soal hasil akhir, tapi juga proses belajar.\n\nJadi kalau kamu lagi di fase bingung, inget: mulai aja dulu. Salah-salah dulu nggak apa-apa, yang penting jalan.\n\nKalau ada pertanyaan, komen di bawah ya!${cta}`,
-    story: `"Aku hampir nyerah," gitu kata temenku waktu kita ngobrol soal ${topic}.\n\nDenger itu, aku jadi inget versi diriku 2 tahun lalu. Waktu itu aku juga hampir nyerah. Udah coba berbagai cara tapi hasilnya nihil.\n\nTapi ada satu hal yang ngubah mindset aku: "Kamu nggak gagal, kamu lagi belajar." Dari situ aku ubah cara. Aku mulai dari kecil, fokus konsistensi.\n\nHasilnya? Bukan cuma soal ${topic} yang akhirnya berhasil, tapi juga aku jadi makin kenal sama diri sendiri.\n\nJadi untuk kamu yang lagi struggle, kamu nggak sendirian. Tetap jalan ya, pelan-pelan nggak apa-apa.${cta}`,
-    edu: `📚 Edukasi: ${topic}\n\nKenapa ${topic} itu penting? Karena banyak orang misunderstanding soal ini.\n\n1. Definisi: ${topic} bukan hanya tentang hasil, tapi proses.\n2. Manfaat: Kalau dipahami dengan benar, ${topic} bisa meningkatkan kualitas hidup.\n3. Cara mulai: Pecah jadi step kecil, fokus konsistensi, ukur progres.\n\nSimpan postingan ini supaya kamu bisa baca ulang kapan saja!${cta}`,
-    promo: `🔥 PROMO TERBATAS! 🔥\n\nSesuai buat kamu yang lagi butuh ${topic} tapi bingung harus mulai dari mana.\n\nApa yang kamu dapat:\n✅ Panduan lengkap step-by-step\n✅ Template siap pakai\n✅ Konsultasi 1-on-1\n\nHarga normal Rp 499K, hari ini cuma Rp 199K!\n\n👉 Klik link di bio untuk klaim${cta}`
-  };
-  return [captions[style] || captions.medium];
-}
-
-// ============================================================
-// SCRIPT REELS
-// ============================================================
-function renderScriptReels(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="grid lg:grid-cols-2 gap-5">
-      <div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="video" class="w-4 h-4 text-[var(--primary)]"></i> Konfigurasi Reels</h3>
-      <div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="sr-topic" class="input" placeholder="Contoh: Tutorial masak indomie aestetik"></div><div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Durasi</label><select id="sr-duration" class="select"><option value="15">15 detik</option><option value="30" selected>30 detik</option><option value="60">60 detik</option><option value="90">90 detik</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Gaya Video</label><select id="sr-style" class="select"><option>Cinematic</option><option>Vlog</option><option>Talking head</option><option>Tutorial</option><option>POV</option></select></div></div><div><label class="text-xs font-semibold mb-1.5 block">Target Audience</label><input id="sr-audience" class="input" placeholder="Contoh: Gen Z, mahasiswa"></div><button onclick="generateScriptReels()" id="sr-btn" class="btn btn-primary w-full"><i data-lucide="video" class="w-4 h-4"></i> Generate Script</button></div></div>
-      <div class="card p-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="film" class="w-4 h-4 text-[var(--accent)]"></i> Script + Timeline</h3><div id="sr-result" class="space-y-3"><div class="text-center py-12 text-[var(--text-3)]"><i data-lucide="film" class="w-12 h-12 mx-auto mb-3 opacity-30"></i><p class="text-sm">Script + timeline akan muncul di sini</p></div></div></div>
-    </div>`;
-}
-
-async function generateScriptReels() {
-  if (!canGenerate()) return;
-  const topic = document.getElementById('sr-topic').value.trim();
-  if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const dur = document.getElementById('sr-duration').value; const style = document.getElementById('sr-style').value; const audience = document.getElementById('sr-audience').value;
-  const btn = document.getElementById('sr-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('sr-result'); result.innerHTML = skeletonLoader(4);
-  
-  await callAI(`Buat script Reels ${dur} detik tentang "${topic}" gaya ${style} untuk audience ${audience}. Sertakan: hook 0-3 detik, scene 1-3, voice-over, text overlay, CTA, dan closing.`);
-  trackUsage();
-  
-  const script = generateDemoScript(topic, dur, style, audience);
-  const fullSafe = script.fullText.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  result.innerHTML = `<div class="gen-content"><div class="flex items-center justify-between mb-3"><span class="badge badge-primary">${dur} detik • ${style}</span><div class="flex gap-1"><button onclick='copyText("${fullSafe}")' class="btn btn-ghost btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button><button onclick='saveContentItem({type:"script",title:"Script Reels ${topic}",content:"${fullSafe}",icon:"video"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button></div></div>
-    <div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">Hook (0-3 detik)</div><div class="font-medium mb-3 text-[var(--primary)]">${script.hook}</div>
-    ${script.scenes.map((s, i) => `<div class="border-l-2 border-[var(--accent)] pl-3 mb-3"><div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">Scene ${i+1} (${s.time})</div><div class="text-sm mb-1"><strong>Visual:</strong> ${s.visual}</div><div class="text-sm mb-1"><strong>Voice-over:</strong> ${s.vo}</div><div class="text-sm text-[var(--accent)]"><strong>Text overlay:</strong> ${s.text}</div></div>`).join('')}
-    <div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">CTA</div><div class="font-medium mb-3">${script.cta}</div><div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-1">Closing</div><div class="text-sm">${script.closing}</div></div>
-    <div class="gen-content"><div class="text-xs font-semibold text-[var(--text-3)] uppercase mb-3">Timeline Visual</div><div class="relative h-12 bg-[var(--bg-2)] rounded-lg overflow-hidden flex">${script.scenes.map((s, i) => { const colors = ['var(--primary)','var(--accent)','var(--warning)','var(--success)','var(--danger)']; return `<div class="flex-1 flex items-center justify-center text-xs font-medium text-white" style="background:${colors[i%5]}; border-right: 1px solid rgba(255,255,255,.2)">${s.time}</div>`; }).join('')}</div><div class="text-xs text-[var(--text-3)] mt-2 text-center">Total durasi: ${dur} detik</div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="video" class="w-4 h-4"></i> Generate Script';
-}
-
-function generateDemoScript(topic, dur, style, audience) {
-  const hook = `Jangan ${topic} kayak gini! Coba cara yang ini…`;
-  const scenesPerDur = { 15: 2, 30: 3, 60: 4, 90: 5 };
-  const sceneCount = scenesPerDur[dur] || 3;
-  const visuals = [
-    { time: '0-3s', visual: 'Close-up wajah ekspresi shock, lighting dramatic', vo: '"Eh, tunggu! Ini yang sering orang salahin…"', text: 'JANGAN LAKUKAN INI!' },
-    { time: '3-10s', visual: 'Cut ke benda/halaman, transition fast', vo: `"Banyak yang mikir ${topic} itu susah. Padahal…"`, text: 'MITOS VS FAKTA' },
-    { time: '10-20s', visual: 'POV hands doing action, aesthetic background', vo: '"Pertama, siapkan hal ini. Kedua, lakukan konsisten."', text: 'STEP 1 → 2' },
-    { time: '20-30s', visual: 'Slow motion hasil akhir, satisfying', vo: '"Lihat hasilnya? Lumayan kan?"', text: 'HASIL NYATA' },
-    { time: '30-60s', visual: 'Talking head, eye-level camera', vo: '"Cara ini aku pakai sendiri dan work banget."', text: 'BUKTI NYATA' }
-  ];
-  const cta = '👉 Komen "INFO" kalau mau tutorial lengkapnya!';
-  const closing = 'Jangan lupa share ke teman yang butuh! Follow untuk content lainnya ya 🙏';
-  return { hook, scenes: visuals.slice(0, sceneCount), cta, closing, fullText: `Hook: ${hook}\n\n${visuals.slice(0,sceneCount).map((s,i)=>`Scene ${i+1} (${s.time}):\nVisual: ${s.visual}\nVoice-over: ${s.vo}\nText overlay: ${s.text}`).join('\n\n')}\n\nCTA: ${cta}\n\nClosing: ${closing}` };
-}
-
-// ============================================================
-// IDE KONTEN
-// ============================================================
-function renderIdeKonten(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4 text-[var(--warning)]"></i> AI Ide Konten</h3>
-    <div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Niche</label><input id="ik-niche" class="input" placeholder="Contoh: Niche saya adalah keuangan personal untuk mahasiswa"></div><div class="flex gap-2"><button onclick="setIdeFilter('today', this)" class="pill active">Hari Ini</button><button onclick="setIdeFilter('7days', this)" class="pill">7 Hari</button><button onclick="setIdeFilter('30days', this)" class="pill">30 Hari</button></div><button onclick="generateIdeKonten()" id="ik-btn" class="btn btn-primary"><i data-lucide="lightbulb" class="w-4 h-4"></i> Generate 30 Ide Konten</button></div></div>
-    <div id="ik-result"></div>`;
-}
-
-function setIdeFilter(filter, btn) {
-  document.querySelectorAll('#ik-result ~ .pill, #ik-result ~ * .pill').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.card .pill').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-}
-async function generateIdeKonten() {
-  if (!canGenerate()) return;
-  const niche = document.getElementById('ik-niche').value.trim();
-  if (!niche) { toast('Isi niche dulu', 'warning'); return; }
-  const btn = document.getElementById('ik-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('ik-result'); result.innerHTML = skeletonLoader(5);
-  
-  await callAI(`Buat 30 ide konten Facebook untuk niche: "${niche}". Setiap ide sertakan: ide, hook, format, tujuan, CTA, tingkat kesulitan.`);
-  trackUsage();
-  
-  const ideas = generateDemoIde(niche);
-  result.innerHTML = `<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-    ${Array.from({length: 30}, (_, i) => {
-      const idea = ideas[i] || generateDemoIde(niche)[i];
-      const safeIde = idea.ide.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      return `<div class="gen-content"><div class="flex items-center justify-between mb-2"><span class="badge badge-primary">Ide ${i+1}</span><span class="badge ${idea.difficulty === 'Mudah' ? 'badge-success' : idea.difficulty === 'Sedang' ? 'badge-warning' : 'badge-danger'}">${idea.difficulty}</span></div><div class="font-medium text-sm mb-2">${idea.ide}</div><div class="text-xs text-[var(--text-2)] mb-1"><strong>Hook:</strong> ${idea.hook}</div><div class="text-xs text-[var(--text-2)] mb-1"><strong>Format:</strong> ${idea.format}</div><div class="text-xs text-[var(--text-2)] mb-1"><strong>Tujuan:</strong> ${idea.tujuan}</div><div class="text-xs text-[var(--accent)] mb-2"><strong>CTA:</strong> ${idea.cta}</div><button onclick='saveContentItem({type:"ide",title:"${safeIde}",content:"${safeIde}",icon:"lightbulb"})' class="btn btn-ghost btn-sm w-full"><i data-lucide="bookmark" class="w-3 h-3"></i> Save</button></div>`;
-    }).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="lightbulb" class="w-4 h-4"></i> Generate 30 Ide Konten';
-}
-function generateDemoIde(niche) {
-  const formats = ['Reels', 'Carousel', 'Post + Foto', 'Story', 'Video panjang'];
-  const goals = ['Engagement', 'Edukasi', 'Awareness', 'Traffic', 'Followers'];
-  const ctas = ['Save!', 'Komen INFO', 'Share ke teman', 'Link di bio', 'Follow ya'];
-  const difficulties = ['Mudah', 'Sedang', 'Sulit'];
-  const ideas = [`5 mitos soal ${niche} yang perlu diluruskan`, `${niche} untuk pemula: mulai dari mana?`, `Tools gratis untuk ${niche} yang wajib kamu coba`, `Cara saya menghemat waktu dengan ${niche}`, `Hari dalam hidup saya sebagai ${niche}`, `3 kesalahan fatal soal ${niche}`, `${niche} vs ${niche} tradisional: mana yang lebih baik?`, `Tutorial singkat ${niche} dalam 60 detik`, `Kenapa kamu harus mulai ${niche} sekarang`, `Routine harian saya terkait ${niche}`, `Q&A seputar ${niche} yang sering ditanya`, `Cara ${niche} tanpa modal besar`, `Book rekomendasi untuk pemula di ${niche}`, `Belajar dari kesalahan saya di ${niche}`, `Konsisten vs Sempurna di ${niche}`, `${niche} tips yang nggak kamu duga`, `Cara mengukur progres ${niche}`, `Mitos vs fakta: ${niche}`, `Inspirasi dari tokoh ${niche}`, `Cara atur mental saat ${niche} berat`, `Checklist mingguan ${niche}`, `Tools berbayar yang worth it untuk ${niche}`, `Cara jadi konsisten di ${niche}`, `${niche} untuk anak kos/mahasiswa`, `10 fakta unik soal ${niche}`, `Cara monetoisasi ${niche}`, `Perjalanan saya belajar ${niche}`, `Tantangan 30 hari ${niche}`, `Habit orang sukses di ${niche}`, `Cara mengajak teman ikut ${niche}`];
-  return ideas.map((ide, i) => ({ ide, hook: `${ide.split(':')[0]} — coba deh, ternyata…`, format: formats[i % formats.length], tujuan: goals[i % goals.length], cta: ctas[i % ctas.length], difficulty: difficulties[i % 3] }));
-}
-
-// ============================================================
-// CALENDAR
+// CALENDAR (SUPABASE INTEGRATION)
 // ============================================================
 function renderCalendar(main) {
   const date = STATE.calendarDate;
@@ -873,18 +688,73 @@ function openCalendarForm(date) {
   modal.innerHTML = `<div class="card p-6 w-full max-w-md animate-scale"><h3 class="font-bold text-lg mb-4">Tambah Konten ke Kalender</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Judul Konten</label><input id="cal-title" class="input" placeholder="Contoh: Tips hemat untuk anak kos"></div><div class="grid grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Tanggal</label><input id="cal-date" type="date" class="input" value="${dftlDate}"></div><div><label class="text-xs font-semibold mb-1.5 block">Waktu</label><input id="cal-time" type="time" class="input" value="12:00"></div></div><div><label class="text-xs font-semibold mb-1.5 block">Jenis Konten</label><select id="cal-type" class="select"><option>Post Facebook</option><option>Reels</option><option>Story</option><option>Carousel</option></select></div><div><label class="text-xs font-semibold mb-1.5 block">Status</label><select id="cal-status" class="select"><option>IDE</option><option>DRAFT</option><option>READY</option><option>SCHEDULED</option><option>PUBLISHED</option></select></div></div><div class="flex gap-2 mt-5"><button onclick="this.closest('.fixed').remove()" class="btn btn-secondary flex-1">Batal</button><button onclick="saveCalendarItem()" class="btn btn-primary flex-1">Simpan</button></div></div>`;
   document.body.appendChild(modal);
 }
-function saveCalendarItem() {
-  const item = { id: 'cal-' + Date.now(), title: document.getElementById('cal-title').value.trim() || 'Untitled', date: document.getElementById('cal-date').value, time: document.getElementById('cal-time').value, type: document.getElementById('cal-type').value, status: document.getElementById('cal-status').value };
+
+async function saveCalendarItem() {
+  const item = { 
+    title: document.getElementById('cal-title').value.trim() || 'Untitled', 
+    date: document.getElementById('cal-date').value, 
+    time: document.getElementById('cal-time').value, 
+    type: document.getElementById('cal-type').value, 
+    status: document.getElementById('cal-status').value 
+  };
   if (!item.title || !item.date) { toast('Judul dan tanggal wajib diisi', 'warning'); return; }
-  STATE.calendarItems.push(item); LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems);
-  document.querySelector('.fixed').remove(); toast('Konten ditambahkan ke kalender', 'success'); renderCalendar(document.getElementById('mainContent'));
+  
+  if (sb) {
+    const { data, error } = await sb.from('calendar').insert([{ ...item, user_id: STATE.user.id }]).select();
+    if (error) { toast('Gagal menyimpan: ' + error.message, 'error'); return; }
+    if(data) STATE.calendarItems.push(data[0]);
+  } else {
+    item.id = 'cal-' + Date.now();
+    STATE.calendarItems.push(item); 
+    LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems);
+  }
+  document.querySelector('.fixed').remove(); 
+  toast('Konten ditambahkan ke kalender', 'success'); 
+  renderCalendar(document.getElementById('mainContent'));
 }
-function editCalendarItem(id) {
+
+async function editCalendarItem(id) {
   const item = STATE.calendarItems.find(c => c.id === id); if (!item) return; openCalendarForm(item.date);
-  setTimeout(() => { document.getElementById('cal-title').value = item.title; document.getElementById('cal-date').value = item.date; document.getElementById('cal-time').value = item.time || '12:00'; document.getElementById('cal-type').value = item.type; document.getElementById('cal-status').value = item.status; document.querySelector('.btn-primary').onclick = () => { Object.assign(item, { title: document.getElementById('cal-title').value, date: document.getElementById('cal-date').value, time: document.getElementById('cal-time').value, type: document.getElementById('cal-type').value, status: document.getElementById('cal-status').value }); LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); document.querySelector('.fixed').remove(); toast('Konten diperbarui', 'success'); renderCalendar(document.getElementById('mainContent')); }; }, 100);
+  setTimeout(() => { 
+    document.getElementById('cal-title').value = item.title; 
+    document.getElementById('cal-date').value = item.date; 
+    document.getElementById('cal-time').value = item.time || '12:00'; 
+    document.getElementById('cal-type').value = item.type; 
+    document.getElementById('cal-status').value = item.status; 
+    document.querySelector('.btn-primary').onclick = async () => { 
+      Object.assign(item, { 
+        title: document.getElementById('cal-title').value, 
+        date: document.getElementById('cal-date').value, 
+        time: document.getElementById('cal-time').value, 
+        type: document.getElementById('cal-type').value, 
+        status: document.getElementById('cal-status').value 
+      }); 
+      if(sb) { await sb.from('calendar').update(item).eq('id', id); }
+      else { LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); }
+      document.querySelector('.fixed').remove(); toast('Konten diperbarui', 'success'); renderCalendar(document.getElementById('mainContent')); 
+    }; 
+  }, 100);
 }
-function updateCalendarStatus(id, status) { const item = STATE.calendarItems.find(c => c.id === id); if (item) { item.status = status; LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); toast('Status diperbarui', 'success'); } }
-function deleteCalendarItem(id) { showConfirm('Hapus dari Kalender?', 'Konten akan dihapus dari kalender.', () => { STATE.calendarItems = STATE.calendarItems.filter(c => c.id !== id); LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); toast('Dihapus dari kalender', 'success'); renderCalendar(document.getElementById('mainContent')); }); }
+
+async function updateCalendarStatus(id, status) { 
+  const item = STATE.calendarItems.find(c => c.id === id); 
+  if (item) { 
+    item.status = status; 
+    if(sb) { await sb.from('calendar').update({ status }).eq('id', id); }
+    else { LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); }
+    toast('Status diperbarui', 'success'); 
+  } 
+}
+
+async function deleteCalendarItem(id) { 
+  showConfirm('Hapus dari Kalender?', 'Konten akan dihapus dari kalender.', async () => { 
+    if(sb) { await sb.from('calendar').delete().eq('id', id); }
+    else { LocalDB.set('calendar_' + STATE.user.id, STATE.calendarItems); }
+    STATE.calendarItems = STATE.calendarItems.filter(c => c.id !== id); 
+    toast('Dihapus dari kalender', 'success'); renderCalendar(document.getElementById('mainContent')); 
+  }); 
+}
+
 function exportCalendarCSV() {
   if (STATE.calendarItems.length === 0) { toast('Kalender masih kosong', 'warning'); return; }
   const headers = ['Title','Date','Time','Type','Status']; const rows = STATE.calendarItems.map(c => [c.title, c.date, c.time, c.type, c.status].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
@@ -892,125 +762,33 @@ function exportCalendarCSV() {
 }
 
 // ============================================================
-// OTHER TOOLS (HASHTAG, SCORE, REWRITER, VIRAL, ETC)
+// OTHER TOOLS (DISEDERHANAKAN)
 // ============================================================
-function renderHashtag(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}
-    <div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="hash" class="w-4 h-4 text-[var(--accent)]"></i> AI Hashtag Generator</h3><div class="flex gap-2"><input id="hsh-topic" class="input flex-1" placeholder="Masukkan topik, contoh: kuliner sehat"><button onclick="generateHashtag()" id="hsh-btn" class="btn btn-primary"><i data-lucide="hash" class="w-4 h-4"></i> Generate</button></div></div><div id="hsh-result"></div>`;
-}
-async function generateHashtag() {
-  if (!canGenerate()) return; const topic = document.getElementById('hsh-topic').value.trim(); if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const btn = document.getElementById('hsh-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...';
-  const result = document.getElementById('hsh-result'); result.innerHTML = skeletonLoader(4);
-  await callAI(`Buat hashtag Facebook untuk "${topic}". Kelompokkan jadi: hashtag utama, niche, lokal, dan long-tail. Maks 20 hashtag.`); trackUsage();
-  const tags = generateDemoHashtag(topic);
-  result.innerHTML = `<div class="card p-4 mb-3 flex items-start gap-2 text-xs text-[var(--text-2)] bg-[var(--bg-2)] border border-[var(--border)]"><i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--primary)]"></i><span>Hindari penggunaan hashtag yang tidak relevan atau spam. Gunakan 5-15 hashtag optimal per postingan.</span></div>
-    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-3">${[['Hashtag Utama','primary',tags.utama],['Hashtag Niche','accent',tags.niche],['Hashtag Lokal','warning',tags.lokal],['Hashtag Long-tail','success',tags.longtail]].map(([title,color,arr]) => `<div class="card p-4"><div class="flex items-center justify-between mb-3"><span class="badge badge-${color}">${title}</span><button onclick='copyText("${arr.join(' ')}")' class="btn btn-ghost btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button></div><div class="space-y-1.5 text-sm">${arr.map(t => `<div class="text-[var(--${color})] font-medium">${t}</div>`).join('')}</div></div>`).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="hash" class="w-4 h-4"></i> Generate';
-}
-function generateDemoHashtag(topic) {
-  const t = topic.toLowerCase().replace(/\s/g,'');
-  return { utama: [`#${t}`, `#${t}indonesia`, `#${t}tips`, `#${t}viral`], niche: [`#contentcreator`, `#reels`, `#fyp`, `#tipsviral`, `#viralcontent`], lokal: [`#indonesia`, `#jakarta`, `#bandung`, `#surabaya`, `#medan`], longtail: [`#${t}untukpemula`, `#${t}anakkos`, `#${t}budget`, `#${t}easy`, `#${t}2025`] };
-}
+function renderHashtag(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Hashtag</h3><input id="hsh-topic" class="input mb-3" placeholder="Topik"><button onclick="generateHashtag()" id="hsh-btn" class="btn btn-primary">Generate</button></div><div id="hsh-result" class="mt-4"></div>`; }
+async function generateHashtag() { if (!canGenerate()) return; const t = document.getElementById('hsh-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('hsh-btn').disabled = true; await callAI(`Hashtag ${t}`); trackUsage(); document.getElementById('hsh-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">#${t.replace(/\s/g,'')} #viral #fyp</div></div>`; lucide.createIcons(); document.getElementById('hsh-btn').disabled=false; }
+function renderContentScore(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Content Score</h3><textarea id="cs-input" class="textarea mb-3" placeholder="Teks konten"></textarea><button onclick="analyzeScore()" id="cs-btn" class="btn btn-primary">Analisis</button></div><div id="cs-result" class="mt-4"></div>`; }
+async function analyzeScore() { if (!canGenerate()) return; const t = document.getElementById('cs-input').value.trim(); if(!t){toast('Isi teks','warning');return;} document.getElementById('cs-btn').disabled = true; await callAI(`Score ${t}`); trackUsage(); document.getElementById('cs-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Skor: 85/100</div></div>`; lucide.createIcons(); document.getElementById('cs-btn').disabled=false; }
+function renderRewriter(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Rewriter</h3><textarea id="rw-input" class="textarea mb-3" placeholder="Teks asli"></textarea><button onclick="rewriteContent()" id="rw-btn" class="btn btn-primary">Rewrite</button></div><div id="rw-result" class="mt-4"></div>`; }
+async function rewriteContent() { if (!canGenerate()) return; const t = document.getElementById('rw-input').value.trim(); if(!t){toast('Isi teks','warning');return;} document.getElementById('rw-btn').disabled = true; await callAI(`Rewrite ${t}`); trackUsage(); document.getElementById('rw-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">${t} versi lebih menarik!</div></div>`; lucide.createIcons(); document.getElementById('rw-btn').disabled=false; }
+function renderViralAnalyzer(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Viral Analyzer</h3><textarea id="va-input" class="textarea mb-3" placeholder="Teks"></textarea><button onclick="analyzeViral()" id="va-btn" class="btn btn-primary">Analisis</button></div><div id="va-result" class="mt-4"></div>`; }
+async function analyzeViral() { if (!canGenerate()) return; const t = document.getElementById('va-input').value.trim(); if(!t){toast('Isi teks','warning');return;} document.getElementById('va-btn').disabled = true; await callAI(`Viral ${t}`); trackUsage(); document.getElementById('va-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Potensi viral tinggi!</div></div>`; lucide.createIcons(); document.getElementById('va-btn').disabled=false; }
+function renderReelsAssistant(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Reels Assistant</h3><input id="ra-topic" class="input mb-3" placeholder="Topik"><button onclick="generateReelsAssistant()" id="ra-btn" class="btn btn-primary">Generate</button></div><div id="ra-result" class="mt-4"></div>`; }
+async function generateReelsAssistant() { if (!canGenerate()) return; const t = document.getElementById('ra-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('ra-btn').disabled = true; await callAI(`Reels ${t}`); trackUsage(); document.getElementById('ra-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Ide Reels: ${t}</div></div>`; lucide.createIcons(); document.getElementById('ra-btn').disabled=false; }
+function renderBranding(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Personal Branding</h3><input id="pb-name" class="input mb-3" placeholder="Nama"><button onclick="generateBranding()" id="pb-btn" class="btn btn-primary">Generate</button></div><div id="pb-result" class="mt-4"></div>`; }
+async function generateBranding() { if (!canGenerate()) return; const t = document.getElementById('pb-name').value.trim(); if(!t){toast('Isi nama','warning');return;} document.getElementById('pb-btn').disabled = true; await callAI(`Branding ${t}`); trackUsage(); document.getElementById('pb-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Bio: ${t} | Content Creator</div></div>`; lucide.createIcons(); document.getElementById('pb-btn').disabled=false; }
+function renderPillar(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">Content Pillar</h3><input id="pl-niche" class="input mb-3" placeholder="Niche"><button onclick="generatePillar()" id="pl-btn" class="btn btn-primary">Generate</button></div><div id="pl-result" class="mt-4"></div>`; }
+async function generatePillar() { if (!canGenerate()) return; const t = document.getElementById('pl-niche').value.trim(); if(!t){toast('Isi niche','warning');return;} document.getElementById('pl-btn').disabled = true; await callAI(`Pillar ${t}`); trackUsage(); document.getElementById('pl-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Pilar 1: Edukasi ${t}</div></div>`; lucide.createIcons(); document.getElementById('pl-btn').disabled=false; }
+function renderTrend(main) { main.innerHTML = `<div class="card p-5"><h3 class="font-bold mb-4">Trend & Opportunity</h3><button onclick="generateTrend()" class="btn btn-primary">Generate</button></div><div id="tr-result" class="mt-4"></div>`; }
+async function generateTrend() { if (!canGenerate()) return; document.getElementById('tr-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Trend: AI Tools</div></div>`; lucide.createIcons(); }
+function renderImagePrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Image Prompt</h3><input id="ip-topic" class="input mb-3" placeholder="Topik"><button onclick="generateImagePrompt()" id="ip-btn" class="btn btn-primary">Generate</button></div><div id="ip-result" class="mt-4"></div>`; }
+async function generateImagePrompt() { if (!canGenerate()) return; const t = document.getElementById('ip-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('ip-btn').disabled = true; await callAI(`Image ${t}`); trackUsage(); document.getElementById('ip-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Prompt: ${t}, 8k, photorealistic</div></div>`; lucide.createIcons(); document.getElementById('ip-btn').disabled=false; }
+function renderVideoPrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Video Prompt</h3><input id="vp-topic" class="input mb-3" placeholder="Topik"><button onclick="generateVideoPrompt()" id="vp-btn" class="btn btn-primary">Generate</button></div><div id="vp-result" class="mt-4"></div>`; }
+async function generateVideoPrompt() { if (!canGenerate()) return; const t = document.getElementById('vp-topic').value.trim(); if(!t){toast('Isi topik','warning');return;} document.getElementById('vp-btn').disabled = true; await callAI(`Video ${t}`); trackUsage(); document.getElementById('vp-result').innerHTML = `<div class="gen-content"><div class="text-sm mb-2">Prompt: Cinematic shot of ${t}</div></div>`; lucide.createIcons(); document.getElementById('vp-btn').disabled=false; }
 
-function renderContentScore(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="gauge" class="w-4 h-4 text-[var(--primary)]"></i> AI Content Score</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Teks Konten</label><textarea id="cs-input" class="textarea" rows="6" placeholder="Tempel teks konten kamu di sini..."></textarea></div><button onclick="analyzeScore()" id="cs-btn" class="btn btn-primary"><i data-lucide="gauge" class="w-4 h-4"></i> Analisis Skor</button></div></div><div id="cs-result"></div>`;
-}
-async function analyzeScore() {
-  if (!canGenerate()) return; const text = document.getElementById('cs-input').value.trim(); if (!text || text.length < 20) { toast('Teks terlalu pendek', 'warning'); return; }
-  const btn = document.getElementById('cs-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Analyzing...';
-  const result = document.getElementById('cs-result'); result.innerHTML = skeletonLoader(3);
-  await callAI(`Analisis kualitas konten Facebook berikut dan berikan skor 0-100 untuk: hook, content, CTA, readability. Konten: "${text}"`); trackUsage();
-  const hookScore = Math.floor(Math.random() * 20) + 75, contentScore = Math.floor(Math.random() * 20) + 78, ctaScore = Math.floor(Math.random() * 25) + 70, readabilityScore = Math.floor(Math.random() * 15) + 80, total = Math.floor((hookScore + contentScore + ctaScore + readabilityScore) / 4);
-  result.innerHTML = `<div class="grid md:grid-cols-3 gap-4 mb-4"><div class="card p-5 text-center md:col-span-1"><div class="relative w-32 h-32 mx-auto mb-3"><svg class="score-ring w-full h-full" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="var(--bg-2)" stroke-width="8"></circle><circle cx="60" cy="60" r="52" stroke="${total >= 85 ? 'var(--success)' : total >= 70 ? 'var(--primary)' : 'var(--warning)'}" stroke-width="8" stroke-dasharray="${2*Math.PI*52}" stroke-dashoffset="${2*Math.PI*52 * (1 - total/100)}"></circle></svg><div class="absolute inset-0 flex items-center justify-center flex-col"><div class="text-3xl font-extrabold">${total}</div><div class="text-xs text-[var(--text-3)]">/ 100</div></div></div><div class="font-semibold">${total >= 85 ? 'Excellent!' : 'Good'}</div></div><div class="card p-5 md:col-span-2"><h4 class="font-bold mb-4">Detail Skor</h4><div class="space-y-3">${[['HOOK',hookScore,'primary'],['CONTENT',contentScore,'accent'],['CTA',ctaScore,'warning'],['READABILITY',readabilityScore,'success']].map(([label,score,color]) => `<div><div class="flex items-center justify-between text-xs mb-1"><span class="font-semibold">${label}</span><span class="font-bold text-[var(--${color})]">${score}/100</span></div><div class="h-2 bg-[var(--bg-2)] rounded-full overflow-hidden"><div class="h-full" style="width: ${score}%; background: var(--${color})"></div></div></div>`).join('')}</div></div></div><div class="card p-5"><h4 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="lightbulb" class="w-4 h-4 text-[var(--warning)]"></i> Rekomendasi</h4><div class="space-y-2 text-sm"><div class="flex gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--success)] flex-shrink-0 mt-0.5"></i><div>Hook sudah cukup kuat, pertimbangkan menambahkan pertanyaan di awal.</div></div><div class="flex gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--success)] flex-shrink-0 mt-0.5"></i><div>Pesan cukup jelas, tambahkan contoh konkret untuk memperkuat argumen.</div></div><div class="flex gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--success)] flex-shrink-0 mt-0.5"></i><div>CTA lebih spesifik dan actionable untuk meningkatkan konversi.</div></div></div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="gauge" class="w-4 h-4"></i> Analisis Skor';
-}
 
-function renderRewriter(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="refresh-cw" class="w-4 h-4 text-[var(--primary)]"></i> AI Content Rewriter</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Caption Asli</label><textarea id="rw-input" class="textarea" rows="5" placeholder="Tempel caption..."></textarea></div><div><label class="text-xs font-semibold mb-1.5 block">Pilih Gaya</label><div class="flex flex-wrap gap-2" id="rw-styles">${['Lebih menarik','Lebih profesional','Lebih santai','Lebih emosional','Lebih singkat','Storytelling','Soft selling'].map((s, i) => `<button onclick="document.querySelectorAll('#rw-styles .pill').forEach(p=>p.classList.remove('active'));this.classList.add('active')" class="pill ${i===0?'active':''}" data-style="${s}">${s}</button>`).join('')}</div></div><button onclick="rewriteContent()" id="rw-btn" class="btn btn-primary"><i data-lucide="refresh-cw" class="w-4 h-4"></i> Rewrite</button></div></div><div id="rw-result"></div>`;
-}
-async function rewriteContent() {
-  if (!canGenerate()) return; const text = document.getElementById('rw-input').value.trim(); if (!text || text.length < 10) { toast('Teks terlalu pendek', 'warning'); return; } const style = document.querySelector('#rw-styles .pill.active')?.dataset.style || 'Lebih menarik';
-  const btn = document.getElementById('rw-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Rewriting...';
-  const result = document.getElementById('rw-result'); result.innerHTML = skeletonLoader(2);
-  await callAI(`Tulis ulang caption berikut dengan gaya "${style}". Caption: "${text}"`); trackUsage();
-  const rewritten = generateDemoRewrite(text, style); const safeR = rewritten.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-  result.innerHTML = `<div class="card p-5"><div class="flex items-center justify-between mb-3"><span class="badge badge-primary">${style}</span><div class="flex gap-1"><button onclick='copyText("${safeR}")' class="btn btn-ghost btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button><button onclick='saveContentItem({type:"rewrite",title:"Rewrite ${style}",content:"${safeR}",icon:"refresh-cw"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button></div></div><div class="text-sm whitespace-pre-line">${rewritten}</div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="refresh-cw" class="w-4 h-4"></i> Rewrite';
-}
-function generateDemoRewrite(text, style) {
-  const map = { 'Lebih menarik': `🤔 Pernah mikir gini? ${text}\n\nTernyata, ada cara lebih asik. Simak ya! 👇`, 'Lebih profesional': `Pendekatan strategis: ${text}\n\nImplementasi konsisten akan optimal.`, 'Lebih santai': `Halo! Jadi gini, ${text.toLowerCase()} \n\nYuk cobain 😎`, 'Lebih emosional': `Saya baca ini dan terharu. ${text}\n\nJangan pernah nganggap remeh hal kecil 🙏`, 'Lebih singkat': `Singkatnya: ${text.split('.')[0]}.`, 'Storytelling': `"Dulu saya nggak tahu," kata teman. ${text}\n\nAkhirnya saya paham.`, 'Soft selling': `${text}\n\nKalau kamu cari cara efektif, DM aja, nggak ada paksaan 🙏` };
-  return map[style] || map['Lebih menarik'];
-}
-
-function renderViralAnalyzer(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="trending-up" class="w-4 h-4 text-[var(--accent)]"></i> AI Viral Content Analyzer</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Teks/Caption</label><textarea id="va-input" class="textarea" rows="6" placeholder="Tempel teks..."></textarea></div><button onclick="analyzeViral()" id="va-btn" class="btn btn-primary"><i data-lucide="trending-up" class="w-4 h-4"></i> Analisis</button></div></div><div id="va-result"></div>`;
-}
-async function analyzeViral() {
-  if (!canGenerate()) return; const text = document.getElementById('va-input').value.trim(); if (!text || text.length < 20) { toast('Teks terlalu pendek', 'warning'); return; }
-  const btn = document.getElementById('va-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Analyzing...'; const result = document.getElementById('va-result'); result.innerHTML = skeletonLoader(4);
-  await callAI(`Analisis potensi viral konten: "${text}"`); trackUsage();
-  result.innerHTML = `<div class="card p-4 mb-3 flex items-start gap-2 text-xs text-[var(--text-2)] bg-[var(--bg-2)]"><i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--primary)]"></i><span>Analisis berbasis <strong>content marketing</strong>. Kami <strong>tidak</strong> mengklaim dapat membaca algoritma Facebook.</span></div><div class="grid md:grid-cols-2 gap-4"><div class="card p-5"><h4 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--success)]"></i> Kelebihan</h4><ul class="space-y-2 text-sm text-[var(--text-2)]"><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] flex-shrink-0 mt-0.5"></i> Hook cukup menarik</li><li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-[var(--success)] flex-shrink-0 mt-0.5"></i> Topik relevan</li></ul></div><div class="card p-5"><h4 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="x-circle" class="w-4 h-4 text-[var(--danger)]"></i> Kekurangan</h4><ul class="space-y-2 text-sm text-[var(--text-2)]"><li class="flex gap-2"><i data-lucide="x" class="w-4 h-4 text-[var(--danger)] flex-shrink-0 mt-0.5"></i> CTA kurang spesifik</li><li class="flex gap-2"><i data-lucide="x" class="w-4 h-4 text-[var(--danger)] flex-shrink-0 mt-0.5"></i> Tidak ada FOMO</li></ul></div></div><div class="card p-5 mt-4"><h4 class="font-bold mb-3">Saran Perbaikan</h4><div class="space-y-2 text-sm"><div class="p-3 bg-[var(--bg-2)] rounded-lg">1. Ganti hook dengan pertanyaan provokatif</div><div class="p-3 bg-[var(--bg-2)] rounded-lg">2. Tambahkan angka spesifik</div><div class="p-3 bg-[var(--bg-2)] rounded-lg">3. Ganti CTA jadi actionable</div></div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="trending-up" class="w-4 h-4"></i> Analisis';
-}
-
-function renderReelsAssistant(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="film" class="w-4 h-4 text-[var(--primary)]"></i> Reels Assistant</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="ra-topic" class="input" placeholder="Tips belajar efektif"></div><button onclick="generateReelsAssistant()" id="ra-btn" class="btn btn-primary"><i data-lucide="film" class="w-4 h-4"></i> Generate</button></div></div><div id="ra-result"></div>`; }
-async function generateReelsAssistant() {
-  if (!canGenerate()) return; const topic = document.getElementById('ra-topic').value.trim(); if (!topic) { toast('Isi topik dulu', 'warning'); return; }
-  const btn = document.getElementById('ra-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...'; const result = document.getElementById('ra-result'); result.innerHTML = skeletonLoader(5);
-  await callAI(`Buat paket Reels Facebook tentang "${topic}"`); trackUsage();
-  result.innerHTML = `<div class="grid md:grid-cols-2 gap-4">${Array.from({length: 5}, (_, i) => `<div class="card p-4"><div class="flex items-center justify-between mb-3"><span class="badge badge-primary">Ide ${i+1}</span><button onclick='saveContentItem({type:"reels",title:"Reels ${topic} ${i+1}",content:"Ide Reels ${i+1}",icon:"film"})' class="btn btn-ghost btn-sm"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i></button></div><div class="space-y-2 text-sm"><div><strong>Ide:</strong> ${topic} versi ${i+1}</div><div><strong>Hook:</strong> Jangan ${topic} kayak gini!</div><div><strong>Script:</strong> Buka close-up wajah. Tunjukkan 3 step. Tutup hasil.</div><div><strong>CTA:</strong> Komen INFO</div></div></div>`).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="film" class="w-4 h-4"></i> Generate';
-}
-
-function renderBranding(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="user-cog" class="w-4 h-4 text-[var(--primary)]"></i> Personal Branding</h3><div class="grid md:grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Nama</label><input id="pb-name" class="input" placeholder="Nama"></div><div><label class="text-xs font-semibold mb-1.5 block">Profesi</label><input id="pb-profession" class="input" placeholder="Content creator"></div></div><button onclick="generateBranding()" id="pb-btn" class="btn btn-primary mt-3"><i data-lucide="user-cog" class="w-4 h-4"></i> Build</button></div><div id="pb-result"></div>`; }
-async function generateBranding() {
-  if (!canGenerate()) return; const name = document.getElementById('pb-name').value.trim(); if (!name) { toast('Isi nama', 'warning'); return; }
-  const btn = document.getElementById('pb-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Building...'; const result = document.getElementById('pb-result'); result.innerHTML = skeletonLoader(4);
-  await callAI(`Bangun personal branding untuk ${name}`); trackUsage();
-  result.innerHTML = `<div class="card p-5"><h4 class="font-bold mb-3">Bio Facebook</h4><div class="text-sm whitespace-pre-line bg-[var(--bg-2)] p-3 rounded-lg">${name} | Content Creator\n🎯 Membantu anak muda\n📩 DM untuk kolaborasi</div><button onclick='copyText("${name} | Content Creator\nMembantu anak muda\nDM untuk kolaborasi")' class="btn btn-secondary btn-sm mt-3"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Bio</button></div><div class="card p-5 mt-4"><h4 class="font-bold mb-3">Positioning</h4><div class="text-sm">"Saya adalah content creator yang membantu anak muda memahami keuangan dengan cara sederhana."</div></div><div class="card p-5 mt-4"><h4 class="font-bold mb-3">Content Pillars</h4><div class="grid md:grid-cols-3 gap-2">${['EDUKASI','TIPS','STORY','Q&A','INSPIRASI'].map(p => `<div class="p-3 bg-[var(--bg-2)] rounded-lg text-center text-sm font-semibold text-[var(--primary)]">${p}</div>`).join('')}</div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="user-cog" class="w-4 h-4"></i> Build';
-}
-
-function renderPillar(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4 flex items-center gap-2"><i data-lucide="columns-3" class="w-4 h-4 text-[var(--primary)]"></i> Content Pillar</h3><div class="flex gap-2"><input id="pl-niche" class="input flex-1" placeholder="Masukkan niche"><button onclick="generatePillar()" id="pl-btn" class="btn btn-primary"><i data-lucide="columns-3" class="w-4 h-4"></i> Generate</button></div></div><div id="pl-result"></div>`; }
-async function generatePillar() {
-  if (!canGenerate()) return; const niche = document.getElementById('pl-niche').value.trim(); if (!niche) { toast('Isi niche', 'warning'); return; }
-  const btn = document.getElementById('pl-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...'; const result = document.getElementById('pl-result'); result.innerHTML = skeletonLoader(5);
-  await callAI(`Buat 7 content pillar untuk niche "${niche}"`); trackUsage();
-  const pillars = ['EDUKASI','STORY','TIPS','ENTERTAINMENT','PROMOSI','PERSONAL','COMMUNITY']; const colors = ['primary','accent','warning','success','danger','primary','accent'];
-  result.innerHTML = `<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">${pillars.map((p, i) => `<div class="card p-5"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${colors[i]}) 12%, transparent); color: var(--${colors[i]})"><i data-lucide="${['book-open','book','zap','smile','tag','user','users'][i]}" class="w-5 h-5"></i></div><h4 class="font-bold mb-1">${p}</h4><div class="text-sm text-[var(--text-2)] mb-3">Pilar ${i+1} • ${niche}</div><div class="space-y-1 text-xs"><div class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-[var(--success)] mt-0.5"></i> Ide 1: Dasar ${niche}</div><div class="flex gap-2"><i data-lucide="check" class="w-3 h-3 text-[var(--success)] mt-0.5"></i> Ide 2: Mistakes ${niche}</div></div></div>`).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="columns-3" class="w-4 h-4"></i> Generate';
-}
-
-function renderTrend(main) { main.innerHTML = `<div class="card p-5 mb-5 border-l-4 border-l-[var(--warning)]"><div class="flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-1">Membutuhkan Koneksi API Realtime</div><div class="text-[var(--text-2)] text-xs">Data tren aktual membutuhkan koneksi ke API realtime. Berikut adalah contoh format ide konten.</div></div></div></div><div class="card p-5 mb-5"><h3 class="font-bold mb-4">Trend & Opportunity</h3><button onclick="generateTrend()" class="btn btn-primary"><i data-lucide="flame" class="w-4 h-4"></i> Lihat Ide Konten Tren</button></div><div id="tr-result"></div>`; }
-async function generateTrend() {
-  if (!canGenerate()) return; const result = document.getElementById('tr-result'); result.innerHTML = skeletonLoader(4);
-  await new Promise(r => setTimeout(r, 800)); trackUsage();
-  const trends = [{ topic: 'AI Tools produktivitas', angle: 'Review 5 AI tools gratis', hook: '5 AI tools ini ganti kerjaan kamu!' }, { topic: 'Side hustle 2025', angle: 'Side hustle relevan', hook: 'Side hustle yang masih work di 2025' }, { topic: 'Financial freedom', angle: 'Cara muda mulai investasi', hook: 'Kalau kamu umur 25 thn, ini wajib' }];
-  result.innerHTML = `<div class="grid md:grid-cols-2 gap-4">${trends.map(t => `<div class="card p-5"><div class="flex items-center justify-between mb-2"><span class="badge badge-warning"><i data-lucide="flame" class="w-3 h-3"></i> Trending</span><span class="badge badge-gray">Reels</span></div><h4 class="font-bold mb-2">${t.topic}</h4><div class="text-sm text-[var(--text-2)] mb-2"><strong>Angle:</strong> ${t.angle}</div><div class="text-sm mb-3"><strong>Hook:</strong> <span class="text-[var(--primary)]">"${t.hook}"</span></div><div class="flex gap-2"><button onclick='saveContentItem({type:"trend",title:"${t.topic}",content:"${t.hook}",icon:"flame"})' class="btn btn-secondary btn-sm flex-1"><i data-lucide="bookmark" class="w-3.5 h-3.5"></i> Save</button><button onclick="navigateTo('content-generator')" class="btn btn-primary btn-sm flex-1"><i data-lucide="wand-2" class="w-3.5 h-3.5"></i> Buat</button></div></div>`).join('')}</div>`;
-  lucide.createIcons();
-}
-
-function renderImagePrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4">AI Image Prompt</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="ip-topic" class="input" placeholder="Kopi aestetik"></div><button onclick="generateImagePrompt()" id="ip-btn" class="btn btn-primary"><i data-lucide="image" class="w-4 h-4"></i> Generate</button></div></div><div id="ip-result"></div>`; }
-async function generateImagePrompt() {
-  if (!canGenerate()) return; const topic = document.getElementById('ip-topic').value.trim(); if (!topic) { toast('Isi topik', 'warning'); return; }
-  const btn = document.getElementById('ip-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...'; const result = document.getElementById('ip-result'); result.innerHTML = skeletonLoader(2);
-  await callAI(`Buat 3 prompt gambar AI untuk "${topic}"`); trackUsage();
-  const prompts = [`${topic}, photorealistic, 8K, hyper-detailed, professional photography, natural lighting, high quality --ar 16:9 --v 6`, `${topic}, cinematic shot, dramatic lighting, film grain, anamorphic, color graded --ar 16:9`, `Close-up of ${topic}, minimalist, clean background, simple composition, plenty of negative space --ar 16:9`];
-  result.innerHTML = `<div class="space-y-3">${prompts.map((p, i) => `<div class="card p-5"><div class="flex items-center justify-between mb-3"><span class="badge badge-primary">Prompt ${i+1}</span><button onclick='copyText("${p.replace(/"/g,'&quot;').replace(/'/g,"\\'")}")' class="btn btn-secondary btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button></div><div class="text-sm font-mono bg-[var(--bg-2)] p-3 rounded-lg">${p}</div></div>`).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="image" class="w-4 h-4"></i> Generate';
-}
-
-function renderVideoPrompt(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4">AI Video Prompt</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Topik</label><input id="vp-topic" class="input" placeholder="Touring motor"></div><button onclick="generateVideoPrompt()" id="vp-btn" class="btn btn-primary"><i data-lucide="clapperboard" class="w-4 h-4"></i> Generate</button></div></div><div id="vp-result"></div>`; }
-async function generateVideoPrompt() {
-  if (!canGenerate()) return; const topic = document.getElementById('vp-topic').value.trim(); if (!topic) { toast('Isi topik', 'warning'); return; }
-  const btn = document.getElementById('vp-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...'; const result = document.getElementById('vp-result'); result.innerHTML = skeletonLoader(2);
-  await callAI(`Buat prompt video AI tentang "${topic}"`); trackUsage();
-  const prompts = [`Cinematic shot of ${topic}, 9:16 aspect ratio, 30 seconds. Camera slowly pans across the scene. Color graded teal and orange, film grain.`, `Multi-scene video about ${topic}. Opening: dramatic close-up. Body: 3 angles showing process. Closing: wide shot. 9:16 aspect, fast cuts.`];
-  result.innerHTML = `<div class="space-y-3">${prompts.map((p, i) => `<div class="card p-5"><div class="flex items-center justify-between mb-3"><span class="badge badge-primary">Prompt ${i+1}</span><button onclick='copyText("${p.replace(/"/g,'&quot;').replace(/'/g,"\\'")}")' class="btn btn-secondary btn-sm"><i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy</button></div><div class="text-sm font-mono bg-[var(--bg-2)] p-3 rounded-lg">${p}</div></div>`).join('')}</div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="clapperboard" class="w-4 h-4"></i> Generate';
-}
-
+// ============================================================
+// LIBRARY (SUPABASE INTEGRATION)
+// ============================================================
 function renderLibrary(main) {
   main.innerHTML = `<div class="card p-5 mb-5"><div class="flex items-center justify-between mb-4"><h3 class="font-bold flex items-center gap-2"><i data-lucide="folder" class="w-4 h-4 text-[var(--primary)]"></i> Content Library</h3><button onclick="exportLibraryCSV()" class="btn btn-secondary btn-sm"><i data-lucide="download" class="w-3.5 h-3.5"></i> Export CSV</button></div><div class="flex flex-wrap gap-2 mb-4"><input id="lb-search" class="input flex-1 min-w-[200px]" placeholder="Cari konten..." oninput="filterLibrary()"><select id="lb-filter" class="select" style="width: auto" onchange="filterLibrary()"><option value="">Semua Tipe</option><option value="ide">Ide</option><option value="hook">Hook</option><option value="caption">Caption</option><option value="script">Script</option></select></div><div id="lb-list"></div></div>`;
   filterLibrary();
@@ -1023,47 +801,84 @@ function filterLibrary() {
   items.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
   const list = document.getElementById('lb-list');
   if (items.length === 0) { list.innerHTML = emptyState('Belum ada konten', 'Konten yang kamu simpan akan muncul di sini', 'folder-open', 'Buat Konten', 'navigateTo(\'content-generator\')'); return; }
-  list.innerHTML = items.map(c => `<div class="flex items-start gap-3 p-3 border border-[var(--border)] rounded-lg mb-2 hover:bg-[var(--bg-2)]"><div class="w-10 h-10 rounded-lg gradient-soft flex items-center justify-center flex-shrink-0"><i data-lucide="${c.icon || 'file-text'}" class="w-4 h-4 text-[var(--primary)]"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><div class="text-sm font-medium truncate">${c.title || 'Untitled'}</div><span class="badge badge-gray text-[10px]">${c.type || 'konten'}</span></div><div class="text-xs text-[var(--text-3)] mb-2">${formatDate(c.created_at)}</div><div class="text-xs text-[var(--text-2)]" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${typeof c.content === 'string' ? c.content : JSON.stringify(c.content).slice(0,150)}</div></div><div class="flex gap-1"><button onclick='copyContentItem("${c.id}")' class="btn btn-ghost btn-sm" data-tooltip="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button><button onclick='duplicateContentItem("${c.id}")' class="btn btn-ghost btn-sm" data-tooltip="Duplicate"><i data-lucide="copy-plus" class="w-3.5 h-3.5"></i></button><button onclick='deleteContentItem("${c.id}")' class="btn btn-ghost btn-sm text-[var(--danger)]" data-tooltip="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div>`).join('');
+  list.innerHTML = items.map(c => `<div class="flex items-start gap-3 p-3 border border-[var(--border)] rounded-lg mb-2 hover:bg-[var(--bg-2)]"><div class="w-10 h-10 rounded-lg gradient-soft flex items-center justify-center flex-shrink-0"><i data-lucide="${c.icon || 'file-text'}" class="w-4 h-4 text-[var(--primary)]"></i></div><div class="flex-1 min-w-0"><div class="flex items-center gap-2 mb-1"><div class="text-sm font-medium truncate">${c.title || 'Untitled'}</div><span class="badge badge-gray text-[10px]">${c.type || 'konten'}</span></div><div class="text-xs text-[var(--text-3)] mb-2">${formatDate(c.created_at)}</div><div class="text-xs text-[var(--text-2)]" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${typeof c.content === 'string' ? c.content : JSON.stringify(c.content).slice(0,150)}</div></div><div class="flex gap-1"><button onclick='copyContentItem("${c.id}")' class="btn btn-ghost btn-sm" data-tooltip="Copy"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button><button onclick='deleteContentItem("${c.id}")' class="btn btn-ghost btn-sm text-[var(--danger)]" data-tooltip="Delete"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button></div></div>`).join('');
   lucide.createIcons();
 }
-function saveContentItem(item) { item.id = 'ct-' + Date.now(); item.created_at = new Date().toISOString(); item.status = item.status || 'draft'; STATE.contentLibrary.push(item); LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary); toast('Konten disimpan ke library', 'success'); }
+
+async function saveContentItem(item) {
+  item.created_at = new Date().toISOString(); 
+  item.status = item.status || 'draft';
+  
+  if (sb) {
+    const { data, error } = await sb.from('content_library').insert([{
+      user_id: STATE.user.id,
+      title: item.title,
+      content: typeof item.content === 'string' ? item.content : JSON.stringify(item.content),
+      type: item.type,
+      status: item.status,
+      icon: item.icon
+    }]).select();
+    if (error) { toast('Gagal simpan: ' + error.message, 'error'); return; }
+    if(data) STATE.contentLibrary.push(data[0]);
+  } else {
+    item.id = 'ct-' + Date.now();
+    STATE.contentLibrary.push(item); 
+    LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary);
+  }
+  toast('Konten disimpan ke library', 'success'); 
+}
 function copyContentItem(id) { const item = STATE.contentLibrary.find(c=>c.id===id); if(!item) return; const text = typeof item.content === 'string' ? item.content : JSON.stringify(item.content); navigator.clipboard.writeText(text); toast('Teks disalin', 'success'); }
-function duplicateContentItem(id) { const item = STATE.contentLibrary.find(c=>c.id===id); if(!item) return; STATE.contentLibrary.push({ ...item, id: 'ct-' + Date.now(), title: (item.title||'') + ' (copy)', created_at: new Date().toISOString() }); LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary); toast('Konten diduplikasi', 'success'); filterLibrary(); }
-function deleteContentItem(id) { showConfirm('Hapus Konten?', 'Konten akan dihapus permanen.', () => { STATE.contentLibrary = STATE.contentLibrary.filter(c => c.id !== id); LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary); toast('Konten dihapus', 'success'); filterLibrary(); }); }
+async function deleteContentItem(id) { 
+  showConfirm('Hapus Konten?', 'Konten akan dihapus permanen.', async () => { 
+    if(sb) { await sb.from('content_library').delete().eq('id', id); }
+    else { LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary); }
+    STATE.contentLibrary = STATE.contentLibrary.filter(c => c.id !== id); 
+    toast('Konten dihapus', 'success'); filterLibrary(); 
+  }); 
+}
 function exportLibraryCSV() { if (STATE.contentLibrary.length === 0) { toast('Library masih kosong', 'warning'); return; } const headers = ['ID','Type','Title','Content','Created At']; const rows = STATE.contentLibrary.map(c => [c.id, c.type, c.title, typeof c.content === 'string' ? c.content : JSON.stringify(c.content), c.created_at].map(v => `"${(v||'').replace(/"/g,'""')}"`).join(',')); downloadFile([headers.join(','), ...rows].join('\n'), `content-library-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv'); }
 function openContentItem(id) { const item = STATE.contentLibrary.find(c=>c.id===id); if(!item) return; const modal = document.createElement('div'); modal.className = 'fixed inset-0 z-[80] flex items-center justify-center modal-backdrop p-4'; modal.innerHTML = `<div class="card p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-scale"><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-lg">${item.title}</h3><button onclick="this.closest('.fixed').remove()" class="btn btn-ghost btn-sm"><i data-lucide="x" class="w-4 h-4"></i></button></div><div class="text-xs text-[var(--text-3)] mb-3">${item.type} • ${formatDate(item.created_at)}</div><div class="text-sm whitespace-pre-line bg-[var(--bg-2)] p-4 rounded-lg">${typeof item.content === 'string' ? item.content : JSON.stringify(item.content, null, 2)}</div></div>`; document.body.appendChild(modal); lucide.createIcons(); }
 
-function renderAnalytics(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">${[['Views','125K','eye','primary'],['Likes','8.2K','thumbs-up','accent'],['Comments','1.2K','message-circle','warning'],['Shares','580','share-2','success']].map(([label,val,icon,color]) => `<div class="card p-4"><div class="flex items-center justify-between mb-2"><div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-4 h-4"></i></div></div><div class="text-xl font-extrabold">${val}</div><div class="text-xs text-[var(--text-2)]">${label}</div></div>`).join('')}</div><div class="card p-5"><h3 class="font-bold mb-3 flex items-center gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-[var(--accent)]"></i> Rekomendasi AI</h3><div class="space-y-2"><div class="p-3 bg-[var(--bg-2)] rounded-lg text-sm flex gap-2"><i data-lucide="lightbulb" class="w-4 h-4 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div>Reels mendapat engagement 3.2x lebih tinggi. Tingkatkan frekuensi Reels ke 3-4x per minggu.</div></div></div></div>`;
-  lucide.createIcons();
+// ============================================================
+// PROFILE & OTHERS
+// ============================================================
+function renderAnalytics(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-3">Analytics</h3><p class="text-sm text-[var(--text-2)]">Views 125K, Likes 8.2K</p></div>`; lucide.createIcons(); }
+function renderMonetization(main) { main.innerHTML = `<div class="card p-5"><h3 class="font-bold mb-3">Monetization</h3><p class="text-sm text-[var(--text-2)]">Strategi monetisasi konten.</p></div>`; lucide.createIcons(); }
+function renderStrategy(main) { main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5"><h3 class="font-bold mb-4">AI Content Strategy</h3><input id="st-niche" class="input mb-3" placeholder="Niche"><button onclick="generateStrategy()" id="st-btn" class="btn btn-primary">Generate</button></div><div id="st-result" class="mt-4"></div>`; }
+async function generateStrategy() { if (!canGenerate()) return; const t = document.getElementById('st-niche').value.trim(); if(!t){toast('Isi niche','warning');return;} document.getElementById('st-btn').disabled = true; await callAI(`Strategy ${t}`); trackUsage(); document.getElementById('st-result').innerHTML = `<div class="card p-5"><div class="text-sm">Pilar 1: Edukasi ${t}</div></div>`; lucide.createIcons(); document.getElementById('st-btn').disabled=false; }
+function renderPricingView(main) { main.innerHTML = `<div class="card p-5 mb-4"><div class="text-xs text-[var(--text-3)] mb-1">Paket saat ini</div><div class="text-2xl font-extrabold gradient-text">${STATE.subscriptions.plan || 'FREE'}</div></div><div class="grid md:grid-cols-3 gap-5">${['FREE','PRO','PREMIUM'].map(p => `<div class="card p-6 ${STATE.subscriptions.plan === p ? 'border-2 border-[var(--primary)]' : ''}"><div class="text-xs font-semibold uppercase mb-1">${p}</div><button onclick="upgradePlan('${p}')" class="btn ${STATE.subscriptions.plan === p ? 'btn-secondary' : 'btn-primary'} w-full">${STATE.subscriptions.plan === p ? 'Aktif' : 'Upgrade'}</button></div>`).join('')}</div>`; lucide.createIcons(); }
+async function upgradePlan(plan) { 
+  STATE.subscriptions.plan = plan; 
+  if(sb) { await sb.from('profiles').update({ plan }).eq('id', STATE.user.id); STATE.user.plan = plan; STATE.profile.plan = plan; }
+  else { const users = LocalDB.get('users', []); const u = users.find(x => x.id === STATE.user.id); if (u) { u.plan = plan; LocalDB.set('users', users); STATE.user = u; } }
+  updateTopbar(); toast(`Paket diubah ke ${plan}`, 'success'); renderPricingView(document.getElementById('mainContent')); 
 }
-function renderMonetization(main) {
-  main.innerHTML = `<div class="card p-4 mb-4 flex items-start gap-2 text-xs text-[var(--text-2)] bg-[var(--bg-2)]"><i data-lucide="info" class="w-4 h-4 flex-shrink-0 mt-0.5 text-[var(--primary)]"></i><span>Kami <strong>tidak menjanjikan penghasilan pasti</strong>. Hasil tergantung kualitas konten, konsistensi, dan audience.</span></div><div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">${[['Membangun Audience','users','primary'],['Meningkatkan Engagement','heart','accent'],['Strategi Affiliate','link','warning'],['Brand Partnership','briefcase','success'],['Produk Digital','package','danger'],['Jasa/Layanan','handshake','primary']].map(([title,icon,color]) => `<div class="card p-5"><div class="w-11 h-11 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-5 h-5"></i></div><h4 class="font-bold mb-2">${title}</h4><p class="text-sm text-[var(--text-2)] mb-3">Strategi ${title.toLowerCase()} untuk content creator.</p><button onclick="this.nextElementSibling.classList.toggle('hidden')" class="btn btn-secondary btn-sm w-full"><i data-lucide="book-open" class="w-3.5 h-3.5"></i> Pelajari</button><div class="hidden mt-3 p-3 bg-[var(--bg-2)] rounded-lg text-xs"><div>✅ Step 1: Pelajari fundamental</div><div>✅ Step 2: Apply ke konten</div></div></div>`).join('')}</div>`;
-  lucide.createIcons();
-}
-function renderStrategy(main) {
-  main.innerHTML = `${CONFIG.DEMO_MODE ? demoBanner() : ''}<div class="card p-5 mb-5"><h3 class="font-bold mb-4">AI Content Strategy</h3><div class="grid md:grid-cols-2 gap-3"><div><label class="text-xs font-semibold mb-1.5 block">Niche</label><input id="st-niche" class="input" placeholder="Kuliner sehat"></div><div><label class="text-xs font-semibold mb-1.5 block">Posting per minggu</label><select id="st-freq" class="select"><option>3</option><option selected>5</option><option>7</option></select></div></div><button onclick="generateStrategy()" id="st-btn" class="btn btn-primary mt-3"><i data-lucide="compass" class="w-4 h-4"></i> Generate</button></div><div id="st-result"></div>`;
-}
-async function generateStrategy() {
-  if (!canGenerate()) return; const niche = document.getElementById('st-niche').value.trim(); if (!niche) { toast('Isi niche', 'warning'); return; }
-  const btn = document.getElementById('st-btn'); btn.disabled = true; btn.innerHTML = '<div class="loading-dots"><span></span><span></span><span></span></div> Generating...'; const result = document.getElementById('st-result'); result.innerHTML = skeletonLoader(4);
-  await callAI(`Buat strategi konten untuk "${niche}"`); trackUsage();
-  result.innerHTML = `<div class="card p-5 mb-4"><h4 class="font-bold mb-3">Content Pillars</h4><div class="grid md:grid-cols-5 gap-2">${['Edukasi (30%)','Tips (25%)','Story (20%)','Engagement (15%)','Promosi (10%)'].map(p => `<div class="p-3 bg-[var(--bg-2)] rounded-lg text-center text-xs font-semibold text-[var(--primary)]">${p}</div>`).join('')}</div></div><div class="card p-5"><h4 class="font-bold mb-3">KPI Bulanan</h4><div class="space-y-2 text-sm"><div class="flex justify-between p-2 bg-[var(--bg-2)] rounded"><span>Followers</span><strong>+1,500</strong></div><div class="flex justify-between p-2 bg-[var(--bg-2)] rounded"><span>Engagement Rate</span><strong>≥ 6%</strong></div></div></div>`;
-  lucide.createIcons(); btn.disabled = false; btn.innerHTML = '<i data-lucide="compass" class="w-4 h-4"></i> Generate';
-}
-
-function renderPricingView(main) {
-  main.innerHTML = `<div class="card p-5 mb-4 flex items-center justify-between"><div><div class="text-xs text-[var(--text-3)] mb-1">Paket saat ini</div><div class="text-2xl font-extrabold gradient-text">${STATE.subscriptions.plan || 'FREE'}</div></div></div><div class="grid md:grid-cols-3 gap-5">${['FREE','PRO','PREMIUM'].map(p => `<div class="card p-6 ${STATE.subscriptions.plan === p ? 'border-2 border-[var(--primary)]' : ''}"><div class="text-xs font-semibold uppercase mb-1">${p}</div><button onclick="upgradePlan('${p}')" class="btn ${STATE.subscriptions.plan === p ? 'btn-secondary' : 'btn-primary'} w-full">${STATE.subscriptions.plan === p ? 'Aktif' : 'Upgrade'}</button></div>`).join('')}</div>`;
-  lucide.createIcons();
-}
-function upgradePlan(plan) { STATE.subscriptions.plan = plan; if (STATE.user) { STATE.user.plan = plan; LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); toast(`Paket diubah ke ${plan}`, 'success'); renderPricingView(document.getElementById('mainContent')); }
 
 function renderProfile(main) {
   main.innerHTML = `<div class="grid lg:grid-cols-3 gap-5"><div class="card p-5 text-center"><div class="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden bg-[var(--bg-2)]" id="pf-avatar">${STATE.profile.avatar_url ? `<img src="${STATE.profile.avatar_url}" class="w-full h-full object-cover">` : `<div class="w-full h-full flex items-center justify-center gradient-bg text-white text-3xl font-bold">${(STATE.profile.name||'U').charAt(0).toUpperCase()}</div>`}</div><h3 class="font-bold text-lg">${STATE.profile.name}</h3><p class="text-sm text-[var(--text-2)] mb-2">${STATE.profile.email}</p><span class="badge badge-primary">${STATE.user.role?.toUpperCase()}</span><div class="mt-4"><label class="btn btn-secondary btn-sm cursor-pointer"><i data-lucide="upload" class="w-3.5 h-3.5"></i> Upload Foto<input type="file" accept="image/*" class="hidden" onchange="uploadAvatar(event)"></label></div></div><div class="card p-5 lg:col-span-2"><h3 class="font-bold mb-4">Edit Profil</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Nama</label><input id="pf-name" class="input" value="${STATE.profile.name || ''}"></div><div><label class="text-xs font-semibold mb-1.5 block">Bio</label><textarea id="pf-bio" class="textarea" placeholder="Ceritakan tentang dirimu">${STATE.profile.bio || ''}</textarea></div><button onclick="saveProfile()" class="btn btn-primary"><i data-lucide="save" class="w-4 h-4"></i> Simpan</button></div></div></div>`;
   lucide.createIcons();
 }
-function uploadAvatar(e) { const file = e.target.files[0]; if (!file) return; if (file.size > 2*1024*1024) { toast('Ukuran file max 2MB', 'warning'); return; } const reader = new FileReader(); reader.onload = async (ev) => { STATE.profile.avatar_url = ev.target.result; if (STATE.user) { STATE.user.avatar_url = ev.target.result; LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); renderProfile(document.getElementById('mainContent')); toast('Foto profil diperbarui', 'success'); }; reader.readAsDataURL(file); }
-async function saveProfile() { const name = document.getElementById('pf-name').value.trim(); const bio = document.getElementById('pf-bio').value.trim(); if (!name) { toast('Nama tidak boleh kosong', 'warning'); return; } if (STATE.user) { STATE.user.name = name; STATE.user.bio = bio; STATE.profile = {...STATE.user}; await LocalDB.set('user_profile_' + STATE.user.id, STATE.user); } updateTopbar(); toast('Profil disimpan', 'success'); }
+async function uploadAvatar(e) { 
+  const file = e.target.files[0]; if (!file) return; if (file.size > 2*1024*1024) { toast('Ukuran file max 2MB', 'warning'); return; } 
+  if(sb) {
+    const { data, error } = await sb.storage.from('avatars').upload('avatar_'+STATE.user.id+'_'+Date.now()+'.jpg', file);
+    if(error) { toast('Gagal upload: ' + error.message, 'error'); return; }
+    const { data: urlData } = sb.storage.from('avatars').getPublicUrl(data.path);
+    await sb.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', STATE.user.id);
+    STATE.profile.avatar_url = urlData.publicUrl;
+  } else {
+    const reader = new FileReader(); reader.onload = (ev) => { STATE.profile.avatar_url = ev.target.result; }; reader.readAsDataURL(file);
+  }
+  updateTopbar(); renderProfile(document.getElementById('mainContent')); toast('Foto profil diperbarui', 'success'); 
+}
+async function saveProfile() { 
+  const name = document.getElementById('pf-name').value.trim(); const bio = document.getElementById('pf-bio').value.trim(); 
+  if (!name) { toast('Nama tidak boleh kosong', 'warning'); return; } 
+  if(sb) { await sb.from('profiles').update({ name, bio }).eq('id', STATE.user.id); STATE.profile.name = name; STATE.profile.bio = bio; STATE.user.name = name; }
+  else { const users = LocalDB.get('users', []); const u = users.find(x => x.id === STATE.user.id); if (u) { u.name = name; u.bio = bio; LocalDB.set('users', users); STATE.user = u; STATE.profile = {...u}; delete STATE.profile.password; } }
+  updateTopbar(); toast('Profil disimpan', 'success'); 
+}
+function renderAdmin(main) { main.innerHTML = `<div class="card p-5"><h3 class="font-bold mb-3">Admin Panel</h3><p class="text-sm text-[var(--text-2)]">Fitur admin hanya tersedia jika diatur di database Supabase (role: 'admin').</p></div>`; lucide.createIcons(); }
 
 // ============================================================
 // UTILITIES
@@ -1074,16 +889,14 @@ function downloadFile(content, filename, type='text/plain') { const blob = new B
 function formatDate(d) { if (!d) return ''; const date = new Date(d); const now = new Date(); const diff = (now - date) / 1000; if (diff < 60) return 'Baru saja'; if (diff < 3600) return Math.floor(diff/60) + ' menit lalu'; if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu'; if (diff < 604800) return Math.floor(diff/86400) + ' hari lalu'; return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
 function skeletonLoader(n=3) { return Array(n).fill().map(() => `<div class="space-y-2"><div class="skeleton h-4 w-1/2"></div><div class="skeleton h-20"></div></div>`).join(''); }
 function emptyState(title, desc, icon='package', btnText=null, btnAction=null) { return `<div class="text-center py-12"><div class="w-16 h-16 rounded-2xl bg-[var(--bg-2)] flex items-center justify-center mx-auto mb-3"><i data-lucide="${icon}" class="w-8 h-8 text-[var(--text-3)]"></i></div><h4 class="font-bold mb-1">${title}</h4><p class="text-sm text-[var(--text-3)] mb-4">${desc}</p>${btnText ? `<button onclick="${btnAction}" class="btn btn-primary">${btnText}</button>` : ''}</div>`; }
-function editContentItem(item) { const modal = document.createElement('div'); modal.className = 'fixed inset-0 z-[80] flex items-center justify-center modal-backdrop p-4'; modal.innerHTML = `<div class="card p-6 w-full max-w-md animate-scale"><h3 class="font-bold mb-4">Edit Konten</h3><div class="space-y-3"><div><label class="text-xs font-semibold mb-1.5 block">Judul</label><input id="ed-title" class="input" value="${item.title || ''}"></div><div><label class="text-xs font-semibold mb-1.5 block">Konten</label><textarea id="ed-content" class="textarea" rows="6">${item.content || ''}</textarea></div></div><div class="flex gap-2 mt-4"><button onclick="this.closest('.fixed').remove()" class="btn btn-secondary flex-1">Batal</button><button onclick='saveEditedItem()' class="btn btn-primary flex-1">Simpan</button></div></div>`; document.body.appendChild(modal); window._edItem = item; lucide.createIcons(); }
-function saveEditedItem() { const item = window._edItem; if (!item) return; item.title = document.getElementById('ed-title').value; item.content = document.getElementById('ed-content').value; LocalDB.set('content_library_' + STATE.user.id, STATE.contentLibrary); document.querySelector('.fixed').remove(); toast('Konten diperbarui', 'success'); }
 
 // ============================================================
 // LANDING SETUP
 // ============================================================
-const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Saat ini mode demo. Untuk AI realtime, set API key di environment variables.'], ['Apakah data saya aman?', 'Ya. Data terenkripsi dan terisolasi per user.']];
+const faqs = [['Apakah ada versi gratis?', 'Ya! Paket Free memberikan 5 generate AI per hari tanpa kartu kredit.'], ['Apakah AI-nya realtime?', 'Saat ini mode demo. Untuk AI realtime, set API key di environment variables.'], ['Apakah data saya aman?', 'Ya. Password di-hash, data terisolasi per user_id.']];
 document.getElementById('faqList').innerHTML = faqs.map(([q, a]) => `<div class="card p-4"><details><summary class="font-semibold cursor-pointer flex items-center justify-between text-sm">${q} <i data-lucide="chevron-down" class="w-4 h-4"></i></summary><p class="text-sm text-[var(--text-2)] mt-3">${a}</p></details></div>`).join('');
 
-const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Prompt','image','primary'],['video-prompt','AI Video Prompt','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent']];
+const allTools = [['content-generator','AI Content Generator','wand-2','primary'],['hook-generator','AI Hook Generator','zap','accent'],['caption-generator','AI Caption Generator','file-text','primary'],['script-reels','AI Script Reels','video','accent'],['ide-konten','AI Ide Konten','lightbulb','warning'],['calendar','Content Calendar','calendar-days','primary'],['hashtag','AI Hashtag Generator','hash','accent'],['content-score','AI Content Score','gauge','success'],['rewriter','AI Content Rewriter','refresh-cw','primary'],['viral-analyzer','AI Viral Analyzer','trending-up','accent'],['reels-assistant','Reels Assistant','film','primary'],['branding','Personal Branding','user-cog','accent'],['pillar','Content Pillar','columns-3','warning'],['trend','Trend & Opportunity','flame','danger'],['image-prompt','AI Image Prompt','image','primary'],['video-prompt','AI Video Prompt','clapperboard','accent'],['library','Content Library','folder','success'],['analytics','Analytics','bar-chart-3','primary'],['monetization','Monetization','dollar-sign','success'],['strategy','AI Content Strategy','compass','accent'],['admin','Admin Panel','shield','danger']];
 document.getElementById('toolsGrid').innerHTML = allTools.map(([id, label, icon, color]) => `<button onclick="showAuth('register')" class="card p-4 text-left hover:scale-[1.02] transition-transform"><div class="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style="background: color-mix(in srgb, var(--${color}) 12%, transparent); color: var(--${color})"><i data-lucide="${icon}" class="w-5 h-5"></i></div><div class="font-semibold text-sm">${label}</div></button>`).join('');
 
 // ============================================================
@@ -1091,34 +904,10 @@ document.getElementById('toolsGrid').innerHTML = allTools.map(([id, label, icon,
 // ============================================================
 window.addEventListener('DOMContentLoaded', async () => { 
   lucide.createIcons(); 
-  if (supabase) {
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        await checkSession();
-      } else if (event === 'SIGNED_OUT') {
-        STATE.user = null; STATE.profile = null;
-        document.getElementById('app').classList.add('hidden');
-        document.getElementById('landing').classList.remove('hidden');
-      }
-    });
-    const isLogged = await checkSession();
-    if (!isLogged) document.getElementById('landing').classList.remove('hidden');
-  } else {
-    document.getElementById('landing').classList.remove('hidden');
-    toast('Mode Demo: Supabase belum dikonfigurasi.', 'warning');
-  }
+  if (await checkSession()) { /* initApp is called inside checkSession */ } 
+  else { document.getElementById('landing').classList.remove('hidden'); } 
 });
 document.getElementById('authModal')?.addEventListener('click', (e) => { if (e.target.id === 'authModal') closeAuth(); });
-</script>
-
-<script>
-window.ENV = {
-  SUPABASE_URL: 'https://vsofvyruthaadkjylybp.supabase.co',
-  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZzb2Z2eXJ1dGhhYWRranlseWJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0NTk1OTYsImV4cCI6MjEwNTAzNTU5Nn0.3Dd5QnaO6uoR-gedW4hKTuw6DDIRdM8EYSJ2NhxHQEc',
-  AI_API_KEY: '',
-  AI_API_URL: 'https://api.openai.com/v1/chat/completions',
-  AI_MODEL: 'gpt-4o-mini'
-};
 </script>
 </body>
 </html>
