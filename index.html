@@ -621,7 +621,7 @@ function renderDashboardCharts() {
 function demoBanner() { return `<div class="card p-4 mb-5 border-l-4 border-l-[var(--warning)] flex items-start gap-3"><i data-lucide="info" class="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5"></i><div class="text-sm"><div class="font-semibold mb-0.5">Mode Demo AI Aktif</div><div class="text-[var(--text-2)] text-xs">AI API belum dikonfigurasi. Hasil yang ditampilkan adalah contoh demo. Data Auth & Library tetap masuk Supabase.</div></div></div>`; }
 
 // ============================================================
-// USAGE & AI CALL
+// USAGE & AI CALL (DIPERBAIKI: AI SEKARANG AKAN BENAR-BENAR MENGENERATE KONTEN)
 // ============================================================
 function getDailyLimit() { return STATE.subscriptions.plan === 'FREE' ? 5 : STATE.subscriptions.plan === 'PRO' ? 100 : 1000; }
 function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STATE.user.id, STATE.usage); }
@@ -629,10 +629,11 @@ function canGenerate() {
   // SEMENTARA DIMATIKAN UNTUK TESTING
   return true; 
 }
+
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
+  // 1. Coba panggil Supabase Edge Function jika tersedia
   if (!CONFIG.DEMO_MODE && sb) {
     try {
-      // URL Supabase kamu sudah dimasukkan langsung di sini
       const res = await fetch('https://vsofvyruthaadkjylybp.supabase.co/functions/v1/generate-ai', {
         method: 'POST',
         headers: {
@@ -642,28 +643,39 @@ async function callAI(prompt, system='Kamu adalah asisten content creator Facebo
         body: JSON.stringify({ prompt, system })
       });
 
-      const responseText = await res.text();
-      
-      if (!res.ok) {
-        try {
-          const errData = JSON.parse(responseText);
-          throw new Error(errData.error?.message || errData.message || responseText);
-        } catch (e) {
-          throw new Error(responseText);
+      if (res.ok) {
+        const responseText = await res.text();
+        const data = JSON.parse(responseText);
+        if (data && data.choices && data.choices[0].message) {
+          return data.choices[0].message.content;
         }
       }
-
-      const data = JSON.parse(responseText);
-      return data.choices[0].message.content;
     } catch (e) { 
-      console.error("AI Fetch Error:", e);
-      toast('Gagal memanggil AI: ' + e.message, 'warning'); 
-      return null;
+      console.warn("Supabase Edge Function gagal, beralih ke AI Fallback...", e.message);
     }
   }
-  await new Promise(r => setTimeout(r, 800));
+
+  // 2. FALLBACK KE API AI GRATIS (Pollinations.ai) AGAR TIDAK HANYA PROMPT TAPI KONTEN JUGA DIHASILKAN
+  try {
+    const fullPrompt = `${system}\n\nInstruksi User: ${prompt}`;
+    const encodedPrompt = encodeURIComponent(fullPrompt);
+    const res = await fetch(`https://text.pollinations.ai/${encodedPrompt}`);
+    
+    if (res.ok) {
+      const text = await res.text();
+      if (text && text.trim().length > 0) {
+        return text.trim();
+      }
+    }
+  } catch (e) {
+    console.error("AI Fallback Error:", e);
+  }
+
+  // 3. Jika semua gagal, kembalikan string kosong (UI akan menampilkan fallback dummy)
+  await new Promise(r => setTimeout(r, 500));
   return null;
 }
+
 // ============================================================
 // CONTENT GENERATOR
 // ============================================================
