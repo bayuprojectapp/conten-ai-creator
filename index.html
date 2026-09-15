@@ -444,7 +444,7 @@ async function checkSession() {
       } catch (e) { console.warn("Profiles table might not exist:", e.message); }
 
       if (!profile) {
-        // Jika profil belum ada di database, buat default di memori
+        // Buat default di memori jika tabel belum ada
         profile = {
           id: userData.user.id,
           name: userData.user.user_metadata?.name || 'User',
@@ -484,14 +484,14 @@ async function initApp() {
     
     if (sb && STATE.user) {
       try {
-        const { data: contents } = await sb.from('content_library').select('*').eq('user_id', STATE.user.id);
+        const { data: contents } = await sb.from('content_library').select('*').eq('owner_id', STATE.user.id);
         STATE.contentLibrary = contents || [];
         
-        const { data: calItems } = await sb.from('calendar').select('*').eq('user_id', STATE.user.id);
+        const { data: calItems } = await sb.from('calendar').select('*').eq('owner_id', STATE.user.id);
         STATE.calendarItems = calItems || [];
       } catch (dbErr) {
         console.error("Error mengambil data dari Supabase:", dbErr.message);
-        toast("Gagal memuat data dari database. Pastikan tabel sudah dibuat.", "warning");
+        toast("Gagal memuat data, periksa tabel database.", "warning");
       }
     } else {
       STATE.contentLibrary = LocalDB.get('content_library_' + STATE.user.id, []);
@@ -855,7 +855,7 @@ async function saveCalendarItem() {
   if (!item.title || !item.date) { toast('Judul dan tanggal wajib diisi', 'warning'); return; }
   
   if (sb) {
-    const { data, error } = await sb.from('calendar').insert([{ ...item, user_id: STATE.user.id }]).select();
+    const { data, error } = await sb.from('calendar').insert([{ ...item, owner_id: STATE.user.id }]).select();
     if (error) { toast('Gagal menyimpan: ' + error.message, 'error'); return; }
     if(data) STATE.calendarItems.push(data[0]);
   } else {
@@ -1077,7 +1077,7 @@ async function saveContentItem(item) {
   
   if (sb) {
     const { data, error } = await sb.from('content_library').insert([{
-      user_id: STATE.user.id,
+      owner_id: STATE.user.id,
       title: item.title,
       content: typeof item.content === 'string' ? item.content : JSON.stringify(item.content),
       type: item.type,
