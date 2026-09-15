@@ -278,7 +278,7 @@ const STATE = {
 };
 
 const CONFIG = {
-  DEMO_MODE: !(window.ENV?.AI_API_KEY) // Demo mode aktif karena tidak ada AI_API_KEY di ENV
+  DEMO_MODE: !(window.ENV?.AI_API_URL)
 };
 
 const LocalDB = {
@@ -628,24 +628,29 @@ function trackUsage() { STATE.usage.today++; if(!sb) LocalDB.set('usage_' + STAT
 function canGenerate() { if (STATE.usage.today >= getDailyLimit()) { toast('Batas harian tercapai. Upgrade ke paket Pro untuk limit lebih tinggi.', 'warning'); return false; } return true; }
 
 async function callAI(prompt, system='Kamu adalah asisten content creator Facebook yang ahli. Selalu jawab dalam bahasa Indonesia yang natural, kreatif, dan menarik.') {
+  // Karena API Key sudah di Supabase Edge Function, kita panggil langsung URL-nya
   if (!CONFIG.DEMO_MODE && window.ENV.AI_API_URL) {
     try {
       const res = await fetch(window.ENV.AI_API_URL, { 
         method: 'POST', 
         headers: { 
-          'Content-Type': 'application/json', 
+          'Content-Type': 'application/json',
+          // Supabase Edge Function butuh Authorization header
           'Authorization': `Bearer ${window.ENV.SUPABASE_ANON_KEY}` 
         }, 
         body: JSON.stringify({ prompt, system }) 
       });
       const data = await res.json();
-      if(data.error) throw new Error(data.error.message || data.error);
+      
+      if (data.error) throw new Error(data.error.message || data.error);
+      
       return data.choices[0].message.content;
     } catch (e) { 
       toast('Gagal memanggil AI: ' + e.message, 'warning'); 
       return null;
     }
   }
+  // Fallback jika tidak ada URL AI
   await new Promise(r => setTimeout(r, 800));
   return null;
 }
